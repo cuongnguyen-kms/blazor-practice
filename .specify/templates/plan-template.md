@@ -17,21 +17,31 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: .NET 8 or .NET 9 (LTS or current)  
+**Framework**: Blazor Web App (Auto/Server/WebAssembly render mode)  
+**Primary Dependencies**: [e.g., MediatR, FluentValidation, AutoMapper or NEEDS CLARIFICATION]  
+**UI/Styling**: Tailwind CSS 3.x (utility-first), [e.g., Radix UI Blazor, Blazorise or custom components]  
+**Storage**: [if applicable, e.g., SQL Server, PostgreSQL, Entity Framework Core, files or N/A]  
+**Testing**: bUnit (component testing), xUnit/NUnit/MSTest (test runner), Moq/NSubstitute (mocking)  
+**Target Platform**: [e.g., Web browsers (Chrome, Firefox, Safari, Edge) or NEEDS CLARIFICATION]  
+**Render Mode**: [e.g., InteractiveAuto, InteractiveServer, InteractiveWebAssembly, Static SSR or NEEDS CLARIFICATION]  
+**Performance Goals**: [domain-specific, e.g., <2s initial page load, <100ms component render, 60 fps animations or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., 80%+ test coverage, WCAG 2.1 AA accessibility, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k concurrent users, 50 components, 20 pages or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **I. Clean Architecture First**: Verify domain/application/infrastructure/presentation layer separation is planned
+- **II. Component-Driven Development**: Confirm all UI features are designed as reusable Blazor components
+- **III. Test-First with bUnit (NON-NEGOTIABLE)**: Ensure bUnit test plan exists for all components before implementation
+- **IV. Tailwind-First Styling**: Verify Tailwind utility classes will be used; no inline styles or CSS bloat
+- **V. Dependency Injection & Services Pattern**: Confirm all business logic resides in services registered via DI
+- **VI. .NET Modern Standards**: Check nullable reference types enabled, async/await, modern C# features planned
+- **VII. Solution-Based Project Structure**: Verify .sln file at root, src/ and tests/ folders, all projects added to solution
+
+**Constitution Reference**: `.specify/memory/constitution.md` v1.1.0
 
 ## Project Structure
 
@@ -49,46 +59,65 @@ specs/[###-feature]/
 
 ### Source Code (repository root)
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  ACTION REQUIRED: All .NET projects MUST be organized within a Visual Studio
+  Solution (.sln) file per Constitution VII. Replace the placeholder tree below
+  with the concrete layout for this feature using the multi-project structure.
+  
+  MANDATORY STRUCTURE:
+  - .sln file at repository root
+  - src/ folder containing all production code projects
+  - tests/ folder containing all test projects
+  - All .csproj files must be added to the solution
+  
+  Delete unused comments and expand the structure with real project names.
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+# REQUIRED: Multi-project solution with .sln file (Constitution VII)
+[ProjectName].sln           # Visual Studio Solution file at root
+
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+├── [ProjectName].Domain/           # Business entities, value objects, domain logic
+├── [ProjectName].Application/      # Use cases, services, DTOs, interfaces
+├── [ProjectName].Infrastructure/   # Data access, external services, implementations
+└── [ProjectName].Presentation/     # Blazor Web App presentation layer
+    ├── Features/                   # Feature-based organization
+    │   ├── Shared/                # Layout, navigation, shared components
+    │   ├── [Feature1]/            # Feature-specific components
+    │   └── [Feature2]/
+    └── wwwroot/
+        ├── css/                   # Tailwind CSS or framework styles
+        └── js/
 
 tests/
-├── contract/
-├── integration/
-└── unit/
+├── [ProjectName].Tests/            # Primary test project
+│   ├── ComponentTests/            # bUnit component tests
+│   ├── UnitTests/                 # Service and logic unit tests
+│   └── TestUtilities/             # Shared test helpers
+└── [ProjectName].IntegrationTests/ # End-to-end integration tests (optional)
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+docs/                               # Documentation (optional)
+└── architecture/                   # Architecture decision records
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
+# Alternative: Blazor + Backend API (when separate backend needed)
+# Still requires .sln file with src/tests structure
+[ProjectName].sln
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
+src/
+├── [ProjectName].Api/              # ASP.NET Core Web API backend
+│   ├── Controllers/
+│   ├── Services/
+│   └── Models/
+├── [ProjectName].Client/           # Blazor WebAssembly client
+│   ├── Features/
+│   ├── Pages/
+│   └── Services/
+└── [ProjectName].Shared/           # Shared DTOs and contracts
 
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+tests/
+├── [ProjectName].Api.Tests/
+└── [ProjectName].Client.Tests/
+```
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real
