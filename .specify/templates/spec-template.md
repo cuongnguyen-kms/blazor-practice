@@ -100,6 +100,23 @@
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+### UI Components *(include if feature involves Blazor components)*
+
+<!--
+  ACTION REQUIRED: List the major Blazor components this feature requires.
+  Components should be designed with reusability and single responsibility in mind.
+-->
+
+- **[ComponentName1]**: [Purpose, key parameters, main responsibilities]
+  - **Input Parameters**: [e.g., User object, callback for submit action]
+  - **Events/Callbacks**: [e.g., OnUserSelected, OnCancelled]
+  - **Testing Focus**: [e.g., rendering with different parameter combinations, event handling]
+
+- **[ComponentName2]**: [Purpose, key parameters, main responsibilities]
+  - **Input Parameters**: [e.g., List items, display mode]
+  - **Events/Callbacks**: [e.g., OnItemClicked]
+  - **Testing Focus**: [e.g., conditional rendering, accessibility]
+
 ## Success Criteria *(mandatory)*
 
 <!--

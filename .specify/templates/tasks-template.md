@@ -20,10 +20,15 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Solution Structure**: `.sln` at root, `src/` for projects, `tests/` for test projects, `docs/` optional (Constitution VII)
+- **Blazor Clean Architecture**: `src/ProjectName.Domain/`, `src/ProjectName.Application/`, `src/ProjectName.Infrastructure/`, `src/ProjectName.Presentation/`
+- **Test Projects**: `tests/ProjectName.Tests/`, `tests/ProjectName.IntegrationTests/`
+- **Components**: `Presentation/Components/Shared/` or `Presentation/Components/Features/`
+- **Pages**: `Presentation/Pages/`
+- **Services**: `Application/Services/` (business) or `Presentation/Services/` (UI)
+- **bUnit Tests**: `ProjectName.Tests/ComponentTests/` (bUnit), `ProjectName.Tests/UnitTests/`
+- **Models**: `Domain/Entities/`, `Application/DTOs/`
+- Paths shown below assume clean architecture - adjust based on plan.md structure
 
 <!-- 
   ============================================================================
@@ -48,9 +53,11 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T001 Create Visual Studio Solution (.sln) at repository root with src/ and tests/ folders (Constitution VII)
+- [ ] T002 Create project structure per implementation plan within src/ folder
+- [ ] T003 Initialize [language] project with [framework] dependencies in src/
+- [ ] T004 Add all .csproj files to solution using `dotnet sln add`
+- [ ] T005 [P] Configure linting and formatting tools
 
 ---
 
@@ -62,12 +69,14 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Setup Tailwind CSS configuration in wwwroot/css/ and tailwind.config.js
+- [ ] T005 [P] Create base component layouts in Presentation/Components/Shared/
+- [ ] T006 [P] Configure dependency injection in Program.cs for application services
+- [ ] T007 [P] Setup bUnit test project and base test fixtures in BlazorApp.Tests/
+- [ ] T008 Create domain entities in Domain/Entities/ that all stories depend on
+- [ ] T009 Configure error handling and logging infrastructure
+- [ ] T010 Setup environment configuration management (appsettings.json)
+- [ ] T011 [P] Enable nullable reference types and configure .editorconfig
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -81,19 +90,24 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+> **NOTE: Write these bUnit tests FIRST, ensure they FAIL before implementation (TDD Red phase)**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T012 [P] [US1] bUnit component test for [ComponentName] in BlazorApp.Tests/ComponentTests/[ComponentName]Tests.cs
+- [ ] T013 [P] [US1] bUnit component interaction test for [user action] in BlazorApp.Tests/ComponentTests/[ComponentName]Tests.cs
+- [ ] T014 [P] [US1] Unit test for [ServiceName] in BlazorApp.Tests/UnitTests/[ServiceName]Tests.cs
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T015 [P] [US1] Create [Entity1] domain entity in Domain/Entities/[Entity1].cs
+- [ ] T016 [P] [US1] Create [Entity2] domain entity in Domain/Entities/[Entity2].cs
+- [ ] T017 [P] [US1] Create DTOs in Application/DTOs/[Feature]/
+- [ ] T018 [US1] Implement [Service] in Application/Services/[Service].cs (depends on T015, T016)
+- [ ] T019 [US1] Register [Service] in Program.cs DI container
+- [ ] T020 [US1] Create [ComponentName] Blazor component in Presentation/Components/Features/[Feature]/[ComponentName].razor
+- [ ] T021 [US1] Style [ComponentName] with Tailwind CSS utility classes
+- [ ] T022 [US1] Add parameter validation and error handling to component
+- [ ] T023 [US1] Verify all bUnit tests pass (TDD Green phase)
+- [ ] T024 [US1] Refactor component and service for clarity (TDD Refactor phase)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -107,15 +121,16 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T025 [P] [US2] bUnit component test for [ComponentName] in BlazorApp.Tests/ComponentTests/[ComponentName]Tests.cs
+- [ ] T026 [P] [US2] Unit test for [ServiceName] in BlazorApp.Tests/UnitTests/[ServiceName]Tests.cs
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T027 [P] [US2] Create [Entity] domain entity in Domain/Entities/[Entity].cs
+- [ ] T028 [US2] Implement [Service] in Application/Services/[Service].cs
+- [ ] T029 [US2] Create [ComponentName] Blazor component in Presentation/Components/Features/[Feature]/[ComponentName].razor
+- [ ] T030 [US2] Style with Tailwind CSS and ensure responsive design
+- [ ] T031 [US2] Verify bUnit tests pass and integrate with User Story 1 (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -129,14 +144,15 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T032 [P] [US3] bUnit component test for [ComponentName] in BlazorApp.Tests/ComponentTests/[ComponentName]Tests.cs
+- [ ] T033 [P] [US3] Unit test for [ServiceName] in BlazorApp.Tests/UnitTests/[ServiceName]Tests.cs
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T034 [P] [US3] Create [Entity] domain entity in Domain/Entities/[Entity].cs
+- [ ] T035 [US3] Implement [Service] in Application/Services/[Service].cs
+- [ ] T036 [US3] Create [ComponentName] Blazor component in Presentation/Components/Features/[Feature]/[ComponentName].razor
+- [ ] T037 [US3] Verify bUnit tests pass and component meets accessibility standards
 
 **Checkpoint**: All user stories should now be independently functional
 
