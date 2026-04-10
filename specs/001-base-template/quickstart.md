@@ -36,25 +36,19 @@ Before using this template, ensure you have:
 git clone <repository-url> my-new-project
 cd my-new-project
 
-# Restore dependencies
+# Restore dependencies (all 8 projects)
 dotnet restore
 
-# Run the application
-dotnet run --project Presentation/BlazorBaseTemplate.csproj
+# Run the application (F5-ready via launchSettings.json)
+dotnet run --project src/BlazorBaseTemplate.Web
 ```
 
-### Option B: Using dotnet new (if template is published as template package)
+### Option B: Open Solution in Visual Studio
 
-```bash
-# Install the template (one-time)
-dotnet new install BlazorBaseTemplate
-
-# Create new project from template
-dotnet new blazor-base-template -n MyCompanyProject
-cd MyCompanyProject
-
-# Run
-dotnet run --project Presentation/BlazorBaseTemplate.csproj
+```
+1. Double-click BlazorBaseTemplate.sln at repository root
+2. Set BlazorBaseTemplate.Web as startup project
+3. Press F5 (launchSettings.json is pre-configured)
 ```
 
 ### Expected Output
@@ -78,39 +72,51 @@ info: Microsoft.Hosting.Lifetime[0]
 
 ---
 
-## 2. Project Structure Overview
+## 2. Project Structure Overview (4-Project Clean Architecture)
 
 ```
-YourProject/
-├── Domain/               # Business entities (lightweight for template)
-│   └── Entities/         # SampleDataItem, DashboardMetric
+BlazorBaseTemplate.sln                    # Solution file at root
 │
-├── Application/          # Services and interfaces
-│   ├── Interfaces/       # ISampleDataService
-│   └── Services/         # SampleDataService (simulated data)
+├── src/
+│   ├── BlazorBaseTemplate.Domain/        # Entities, value objects (zero dependencies)
+│   │   └── Entities/                     # DashboardMetric, SampleDataItem (record types)
+│   │
+│   ├── BlazorBaseTemplate.Application/   # Services, interfaces, DTOs (→ Domain)
+│   │   ├── Interfaces/                   # ISampleDataService
+│   │   └── Services/                     # SampleDataService (simulated data)
+│   │
+│   ├── BlazorBaseTemplate.Infrastructure/ # External systems (→ Application, Domain)
+│   │   └── Configuration/                # DI extension methods
+│   │
+│   └── BlazorBaseTemplate.Web/           # Blazor WASM UI ⭐ Main work area (→ all layers)
+│       ├── Features/                     # Feature-based organization
+│       │   ├── Dashboard/                # Dashboard page + MetricCard
+│       │   ├── DataExample/              # Data fetching example + DataTable
+│       │   └── Shared/                   # MainLayout, NavMenu
+│       ├── Themes/                       # CustomTheme.cs
+│       ├── Program.cs                    # App startup & DI configuration
+│       ├── App.razor                     # Router with AdditionalAssemblies
+│       ├── Properties/
+│       │   └── launchSettings.json       # F5-ready profiles
+│       └── wwwroot/                      # Static assets
 │
-├── Infrastructure/       # External systems (minimal in template)
-│   └── Configuration/    # DI helpers
-│
-├── Presentation/         # Blazor WebAssembly UI ⭐ Main work area
-│   ├── Features/         # Feature-based organization
-│   │   ├── Dashboard/    # Dashboard feature
-│   │   │   ├── Dashboard.razor
-│   │   │   └── Components/
-│   │   ├── DataExample/  # Data fetching example
-│   │   │   ├── DataExample.razor
-│   │   │   └── Components/
-│   │   └── Shared/       # Shared layout
-│   │       ├── MainLayout.razor
-│   │       └── NavMenu.razor
-│   ├── Program.cs        # App startup & DI configuration
-│   ├── App.razor         # Root component
-│   └── wwwroot/          # Static assets
-│
-└── BlazorBaseTemplate.Tests/  # bUnit tests
-    ├── ComponentTests/   # UI component tests
-    └── UnitTests/        # Business logic tests
+└── tests/
+    ├── BlazorBaseTemplate.Domain.Tests/
+    ├── BlazorBaseTemplate.Application.Tests/
+    ├── BlazorBaseTemplate.Infrastructure.Tests/
+    └── BlazorBaseTemplate.Web.Tests/     # bUnit component tests
+        ├── ComponentTests/               # UI component tests  
+        └── TestUtilities/                # Shared test helpers
 ```
+
+### Dependency Rules
+
+| Project | Can Reference |
+|---------|---------------|
+| Domain | Nothing |
+| Application | Domain only |
+| Infrastructure | Application + Domain |
+| Web | Infrastructure + Application + Domain |
 
 ---
 
@@ -118,7 +124,7 @@ YourProject/
 
 ### 🎨 Branding & Theming
 
-**File**: `Presentation/App.razor`
+**File**: `src/BlazorBaseTemplate.Web/App.razor`
 
 Replace the default theme with your company colors:
 
@@ -136,7 +142,7 @@ Replace the default theme with your company colors:
 }
 ```
 
-**File**: `Presentation/Features/Shared/Components/AppLogo.razor`
+**File**: `src/BlazorBaseTemplate.Web/Features/Shared/Components/AppLogo.razor`
 
 Replace placeholder logo with your company logo:
 
@@ -149,7 +155,7 @@ Replace placeholder logo with your company logo:
 
 ### 🧭 Navigation
 
-**File**: `Presentation/Features/Shared/NavMenu.razor`
+**File**: `src/BlazorBaseTemplate.Web/Features/Shared/NavMenu.razor`
 
 Add new routes to the sidebar:
 
@@ -173,7 +179,7 @@ Add new routes to the sidebar:
 
 ### ⚙️ Configuration
 
-**File**: `Presentation/wwwroot/appsettings.json`
+**File**: `src/BlazorBaseTemplate.Web/wwwroot/appsettings.json`
 
 Add environment-specific settings:
 
@@ -204,12 +210,12 @@ Follow this pattern to add new features (maintains clean architecture):
 ### Step 1: Create Feature Folder
 
 ```bash
-mkdir -p Presentation/Features/YourFeature/Components
+mkdir -p src/BlazorBaseTemplate.Web/Features/YourFeature/Components
 ```
 
 ### Step 2: Create Feature Page
 
-**File**: `Presentation/Features/YourFeature/YourFeature.razor`
+**File**: `src/BlazorBaseTemplate.Web/Features/YourFeature/YourFeature.razor`
 
 ```razor
 @page "/your-feature"
@@ -231,7 +237,7 @@ mkdir -p Presentation/Features/YourFeature/Components
 
 ### Step 3: Add Navigation Link
 
-Update `Presentation/Features/Shared/NavMenu.razor`:
+Update `src/BlazorBaseTemplate.Web/Features/Shared/NavMenu.razor`:
 
 ```html
 <MudNavLink Href="/your-feature" Icon="@Icons.Material.Filled.Star">
@@ -241,7 +247,7 @@ Update `Presentation/Features/Shared/NavMenu.razor`:
 
 ### Step 4: Create Feature Components
 
-**File**: `Presentation/Features/YourFeature/Components/YourComponent.razor`
+**File**: `src/BlazorBaseTemplate.Web/Features/YourFeature/Components/YourComponent.razor`
 
 ```razor
 <MudCard>
@@ -258,7 +264,7 @@ Update `Presentation/Features/Shared/NavMenu.razor`:
 
 ### Step 5: Write bUnit Test
 
-**File**: `BlazorBaseTemplate.Tests/ComponentTests/YourFeature/YourComponentTests.cs`
+**File**: `tests/BlazorBaseTemplate.Web.Tests/ComponentTests/YourFeature/YourComponentTests.cs`
 
 ```csharp
 using Bunit;
@@ -291,7 +297,7 @@ The template uses `SampleDataService` with hardcoded data. Replace it with real 
 
 ### Step 1: Create API Service Implementation
 
-**File**: `Application/Services/RealDataService.cs`
+**File**: `src/BlazorBaseTemplate.Application/Services/RealDataService.cs`
 
 ```csharp
 public class RealDataService : ISampleDataService
@@ -320,7 +326,7 @@ public class RealDataService : ISampleDataService
 
 ### Step 2: Update DI Registration
 
-**File**: `Presentation/Program.cs`
+**File**: `src/BlazorBaseTemplate.Web/Program.cs`
 
 ```csharp
 // Configure HttpClient for API calls
@@ -368,17 +374,21 @@ protected override async Task OnInitializedAsync()
 ### Run All Tests
 
 ```bash
+# All 4 test projects
 dotnet test
 ```
 
-### Run Specific Test Category
+### Run Tests By Layer
 
 ```bash
-# Component tests only
-dotnet test --filter Category=ComponentTests
+# Web component tests only (bUnit)
+dotnet test tests/BlazorBaseTemplate.Web.Tests
 
-# Unit tests only
-dotnet test --filter Category=UnitTests
+# Application service tests only
+dotnet test tests/BlazorBaseTemplate.Application.Tests
+
+# Domain entity tests only
+dotnet test tests/BlazorBaseTemplate.Domain.Tests
 ```
 
 ### Run with Code Coverage
@@ -394,7 +404,7 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ### Build Optimized Release
 
 ```bash
-dotnet publish Presentation/BlazorBaseTemplate.csproj -c Release -o ./publish
+dotnet publish src/BlazorBaseTemplate.Web/BlazorBaseTemplate.Web.csproj -c Release -o ./publish
 ```
 
 This creates optimized, trimmed output in `./publish/wwwroot/`.
@@ -431,7 +441,7 @@ jobs:
       - uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-      - run: dotnet publish -c Release -o publish
+      - run: dotnet publish src/BlazorBaseTemplate.Web -c Release -o publish
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -444,7 +454,7 @@ jobs:
 
 ```toml
 [build]
-  command = "dotnet publish Presentation/BlazorBaseTemplate.csproj -c Release -o publish"
+  command = "dotnet publish src/BlazorBaseTemplate.Web/BlazorBaseTemplate.Web.csproj -c Release -o publish"
   publish = "publish/wwwroot"
 ```
 
@@ -467,12 +477,12 @@ dotnet restore
 **Solution**: Ensure you're running with `dotnet watch`:
 
 ```bash
-dotnet watch --project Presentation/BlazorBaseTemplate.csproj
+dotnet watch --project src/BlazorBaseTemplate.Web
 ```
 
 ### Issue: Large download size (>2MB)
 
-**Solution**: Enable trimming in `.csproj`:
+**Solution**: Enable trimming in `src/BlazorBaseTemplate.Web/BlazorBaseTemplate.Web.csproj`:
 
 ```xml
 <PropertyGroup>
@@ -508,6 +518,17 @@ After setup, consider:
 7. ✅ **Improve accessibility**: Add ARIA labels, keyboard shortcuts
 8. ✅ **Set up monitoring**: Integrate Application Insights or Sentry
 
+### Cost Optimization Reminder
+
+Before implementing any new feature, always run the validation pipeline (Constitution X):
+
+```
+1. /speckit.checklist    → Generate quality checklists
+2. /speckit.analyze      → Cross-artifact consistency check
+3. Fix all issues
+4. /speckit.implement    → Generate code (delta-updates only)
+```
+
 ---
 
 ## 10. Common Development Workflows
@@ -516,16 +537,16 @@ After setup, consider:
 
 ```bash
 # Start dev server with hot reload
-dotnet watch --project Presentation/BlazorBaseTemplate.csproj
+dotnet watch --project src/BlazorBaseTemplate.Web
 
 # In separate terminal: Run tests in watch mode
-dotnet watch test
+dotnet watch test --project tests/BlazorBaseTemplate.Web.Tests
 ```
 
 ### Before Committing
 
 ```bash
-# Run all tests
+# Run all tests (4 test projects)
 dotnet test
 
 # Check code style
@@ -542,7 +563,7 @@ dotnet build -c Release
 dotnet test /p:CollectCoverage=true
 
 # Build optimized release
-dotnet publish -c Release -o ./publish
+dotnet publish src/BlazorBaseTemplate.Web -c Release -o ./publish
 
 # Verify bundle size
 du -sh ./publish/wwwroot/_framework/*.wasm

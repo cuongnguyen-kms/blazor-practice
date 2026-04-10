@@ -1,39 +1,46 @@
 # Tasks: Blazor Base Template
 
 **Input**: Design documents from `/specs/001-base-template/`
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/component-contracts.md, quickstart.md
+**Prerequisites**: plan.md (Constitution v1.3.0), spec.md, research.md, data-model.md, contracts/component-contracts.md, quickstart.md
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**Structure**: 4-project Clean Architecture per Constitution v1.3.0 (Domain, Application, Infrastructure, Web) + 4 mirrored test projects.
 
 ---
 
-## Format: `[ID] [P?] [Story?] Description`
+## Format: `- [ ] [ID] [P?] [Story?] Description with file path`
 
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
+- **Checkbox**: `- [ ]` (markdown checkbox, required)
+- **[P]**: Can run in parallel (different files, no dependencies on incomplete tasks)
+- **[Story]**: Which user story this task belongs to (US1, US2, US3) — only in user story phases
 - Include exact file paths in descriptions
 
 ---
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Setup (Project Initialization)
 
-**Purpose**: Project initialization, solution structure, and basic architecture
+**Purpose**: Create solution, 4 production projects, 4 test projects, and shared config
 
-- [X] T001 Create Visual Studio Solution file at repository root: `dotnet new sln -n BlazorBaseTemplate`
-- [X] T002 [P] Create src/ and tests/ folder structure in repository root
-- [X] T003 Create Blazor WebAssembly project in src/ using `dotnet new blazorwasm -n BlazorBaseTemplate -o src/BlazorBaseTemplate`
-- [X] T004 Create test project in tests/ using `dotnet new xunit -n BlazorBaseTemplate.Tests -o tests/BlazorBaseTemplate.Tests`
-- [X] T005 Add projects to solution: `dotnet sln add src/BlazorBaseTemplate/BlazorBaseTemplate.csproj tests/BlazorBaseTemplate.Tests/BlazorBaseTemplate.Tests.csproj`
-- [X] T006 [P] Install MudBlazor NuGet package (8.x) in src/BlazorBaseTemplate project
-- [X] T007 [P] Install bUnit NuGet package (2.x) in tests/BlazorBaseTemplate.Tests project
-- [X] T008 [P] Install Moq NuGet package in tests/BlazorBaseTemplate.Tests project
-- [X] T009 [P] Add project reference from tests to src project
-- [X] T010 Create clean architecture folder structure in src/BlazorBaseTemplate: Domain/, Application/, Infrastructure/, Presentation/
-- [X] T011 [P] Configure nullable reference types in all .csproj files (`<Nullable>enable</Nullable>`)
-- [X] T012 [P] Create .editorconfig in repository root for code style enforcement
-- [X] T013 Create feature-based folder structure in src/BlazorBaseTemplate/Presentation/Features/ (Dashboard/, DataExample/, Shared/)
-- [X] T014 [P] Create README.md in repository root with initial setup instructions
-- [X] T015 Configure git ignore for .NET projects (.gitignore for bin/, obj/, publish/, etc.)
+- [ ] T001 Create Visual Studio Solution file at repository root: `dotnet new sln -n BlazorBaseTemplate`
+- [ ] T002 [P] Create src/ and tests/ folder structure in repository root
+- [ ] T003 Create Domain class library: `dotnet new classlib -n BlazorBaseTemplate.Domain -o src/BlazorBaseTemplate.Domain`
+- [ ] T004 [P] Create Application class library: `dotnet new classlib -n BlazorBaseTemplate.Application -o src/BlazorBaseTemplate.Application`
+- [ ] T005 [P] Create Infrastructure class library: `dotnet new classlib -n BlazorBaseTemplate.Infrastructure -o src/BlazorBaseTemplate.Infrastructure`
+- [ ] T006 Create Blazor WebAssembly project: `dotnet new blazorwasm -n BlazorBaseTemplate.Web -o src/BlazorBaseTemplate.Web --empty`
+- [ ] T007 Add project references: Application → Domain, Infrastructure → Application + Domain, Web → Infrastructure + Application + Domain
+- [ ] T008 Add all 4 src projects to solution: `dotnet sln add src/BlazorBaseTemplate.Domain src/BlazorBaseTemplate.Application src/BlazorBaseTemplate.Infrastructure src/BlazorBaseTemplate.Web`
+- [ ] T009 Create Domain test project: `dotnet new xunit -n BlazorBaseTemplate.Domain.Tests -o tests/BlazorBaseTemplate.Domain.Tests`
+- [ ] T010 [P] Create Application test project: `dotnet new xunit -n BlazorBaseTemplate.Application.Tests -o tests/BlazorBaseTemplate.Application.Tests`
+- [ ] T011 [P] Create Infrastructure test project: `dotnet new xunit -n BlazorBaseTemplate.Infrastructure.Tests -o tests/BlazorBaseTemplate.Infrastructure.Tests`
+- [ ] T012 [P] Create Web test project: `dotnet new xunit -n BlazorBaseTemplate.Web.Tests -o tests/BlazorBaseTemplate.Web.Tests`
+- [ ] T013 Add all 4 test projects to solution and add project references from each test project to its matching src project
+- [ ] T014 [P] Install MudBlazor NuGet package (7.x+) in src/BlazorBaseTemplate.Web
+- [ ] T015 [P] Install bUnit (1.26+) and Moq packages in tests/BlazorBaseTemplate.Web.Tests
+- [ ] T016 [P] Install Moq package in tests/BlazorBaseTemplate.Application.Tests
+- [ ] T017 [P] Configure `<Nullable>enable</Nullable>` in all 8 .csproj files
+- [ ] T018 [P] Create .editorconfig in repository root for code style enforcement
+- [ ] T019 [P] Configure .gitignore for .NET projects (bin/, obj/, publish/, .vs/)
+- [ ] T020 [P] Create README.md in repository root with initial setup instructions and architecture diagram
 
 ---
 
@@ -43,151 +50,130 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [X] T016 Register MudBlazor services in src/BlazorBaseTemplate/Presentation/Program.cs (`builder.Services.AddMudServices()`)
-- [X] T017 [P] Create Presentation/App.razor with MudThemeProvider, MudDialogProvider, MudSnackbarProvider
-- [X] T018 [P] Create Presentation/_Imports.razor with global using directives (@using MudBlazor, etc.)
-- [X] T019 [P] Create custom MudBlazor theme in Presentation/Themes/CustomTheme.cs
-- [X] T020 Configure routing in Presentation/App.razor with Router component
-- [X] T021 [P] Create Presentation/wwwroot/index.html entry point for Blazor WASM
-- [X] T022 [P] Create Presentation/wwwroot/appsettings.json for client-side configuration
-- [X] T023 [P] Set up bUnit test context helpers in tests/BlazorBaseTemplate.Tests/TestUtilities/TestContextBase.cs
-- [X] T024 Enable PublishTrimmed in src/BlazorBaseTemplate/BlazorBaseTemplate.csproj for WASM optimization
-- [X] T025 Configure hot reload support in launchSettings.json
+- [ ] T021 Register MudBlazor services in src/BlazorBaseTemplate.Web/Program.cs (`builder.Services.AddMudServices()`)
+- [ ] T022 [P] Create src/BlazorBaseTemplate.Web/App.razor with Router, AdditionalAssemblies, MudThemeProvider, MudDialogProvider, MudSnackbarProvider (Constitution VIII)
+- [ ] T023 [P] Create src/BlazorBaseTemplate.Web/_Imports.razor with global using directives (@using MudBlazor, @using BlazorBaseTemplate.Domain.Entities, etc.)
+- [ ] T024 [P] Create custom MudBlazor theme in src/BlazorBaseTemplate.Web/Themes/CustomTheme.cs
+- [ ] T025 [P] Create src/BlazorBaseTemplate.Web/wwwroot/index.html entry point for Blazor WASM
+- [ ] T026 [P] Create src/BlazorBaseTemplate.Web/wwwroot/appsettings.json for client-side configuration
+- [ ] T027 [P] Create src/BlazorBaseTemplate.Web/Properties/launchSettings.json with HTTPS and HTTP profiles (Constitution VII)
+- [ ] T028 [P] Create feature-based folder structure in src/BlazorBaseTemplate.Web/Features/ (Dashboard/, DataExample/, Shared/ with Components/ subfolders)
+- [ ] T029 [P] Create src/BlazorBaseTemplate.Infrastructure/Configuration/ServiceCollectionExtensions.cs for DI organization
+- [ ] T030 [P] Set up bUnit test context helper in tests/BlazorBaseTemplate.Web.Tests/TestUtilities/TestContextBase.cs (with AddMudServices())
+- [ ] T031 Enable PublishTrimmed in src/BlazorBaseTemplate.Web/BlazorBaseTemplate.Web.csproj for WASM optimization
 
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
 ---
 
-## Phase 3: User Story 1 - Core Layout and Navigation (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 — Core Layout and Navigation (Priority: P1) 🎯 MVP
 
 **Goal**: Provide responsive sidebar navigation with MudDrawer that works across all pages
 
-**Independent Test**: Run application, verify sidebar appears, navigate between routes, resize browser to test mobile collapse/expand
+**Independent Test**: Run application via `dotnet run --project src/BlazorBaseTemplate.Web`, verify sidebar appears, navigate between routes, resize browser to test mobile collapse/expand
 
 ### bUnit Tests for User Story 1
 
 > **NOTE: Write these bUnit tests FIRST, ensure they FAIL before implementation (TDD Red phase)**
 
-- [X] T026 [P] [US1] Create bUnit test for MainLayout in tests/BlazorBaseTemplate.Tests/ComponentTests/Shared/MainLayoutTests.cs (test drawer toggle)
-- [X] T027 [P] [US1] Create bUnit test for NavMenu in tests/BlazorBaseTemplate.Tests/ComponentTests/Shared/NavMenuTests.cs (test navigation links)
+- [ ] T032 [P] [US1] Create bUnit test for MainLayout in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/MainLayoutTests.cs (test drawer toggle, responsive behavior)
+- [ ] T033 [P] [US1] Create bUnit test for NavMenu in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/NavMenuTests.cs (test navigation links render, active state)
+- [ ] T033b [P] [US1] Create bUnit test for AppLogo in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/AppLogoTests.cs (test renders correctly)
 
 ### Implementation for User Story 1
 
-- [X] T028 [P] [US1] Create MainLayout.razor in src/BlazorBaseTemplate/Presentation/Features/Shared/MainLayout.razor with MudLayout structure
-- [X] T029 [US1] Implement MudAppBar with hamburger menu button in MainLayout.razor
-- [X] T030 [US1] Implement MudDrawer with bind-Open in MainLayout.razor (depends on T028)
-- [X] T031 [US1] Create MainLayout.razor.cs code-behind with drawer toggle logic
-- [X] T032 [P] [US1] Create NavMenu.razor in src/BlazorBaseTemplate/Presentation/Features/Shared/NavMenu.razor with MudNavMenu
-- [X] T033 [US1] Add MudNavLink components for Dashboard ("/") and Data Example ("/data") routes in NavMenu.razor
-- [X] T034 [P] [US1] Create AppLogo.razor component in src/BlazorBaseTemplate/Presentation/Features/Shared/Components/AppLogo.razor
-- [X] T035 [US1] Configure MainLayout as default layout in Presentation/App.razor Router
-- [X] T036 [US1] Add responsive breakpoint handling for mobile (<768px) in MainLayout
-- [X] T037 [US1] Verify all bUnit tests pass (TDD Green phase)
-- [X] T038 [US1] Refactor MainLayout and NavMenu for code clarity (TDD Refactor phase)
+- [ ] T034 [P] [US1] Create MainLayout.razor in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor with MudLayout, MudAppBar, MudDrawer structure
+- [ ] T035 [US1] Implement MainLayout.razor.cs code-behind with drawer toggle logic and responsive breakpoint handling in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor.cs
+- [ ] T036 [P] [US1] Create NavMenu.razor in src/BlazorBaseTemplate.Web/Features/Shared/NavMenu.razor with MudNavMenu and MudNavLink for "/" (Dashboard)
+- [ ] T037 [P] [US1] Create AppLogo.razor component in src/BlazorBaseTemplate.Web/Features/Shared/Components/AppLogo.razor
+- [ ] T038 [US1] Configure MainLayout as default layout in src/BlazorBaseTemplate.Web/App.razor Router DefaultLayout parameter
+- [ ] T039 [US1] Verify all US1 bUnit tests pass (TDD Green phase) and refactor for clarity
 
-**Checkpoint**: At this point, User Story 1 should be fully functional - responsive layout with working navigation
+**Checkpoint**: User Story 1 fully functional — responsive layout with working sidebar navigation
 
 ---
 
-## Phase 4: User Story 2 - Dashboard Home Page (Priority: P2)
+## Phase 4: User Story 2 — Dashboard Home Page (Priority: P2)
 
 **Goal**: Provide dashboard landing page with metric cards demonstrating component composition
 
-**Independent Test**: Navigate to "/" route, verify 4 metric cards display, test responsive grid reflow
+**Independent Test**: Navigate to "/" route, verify 4 metric cards display, resize browser to test responsive grid reflow
 
-### Domain & Application for User Story 2
+### Domain for User Story 2
 
-- [X] T039 [P] [US2] Create DashboardMetric.cs entity in src/BlazorBaseTemplate/Domain/Entities/DashboardMetric.cs
-- [X] T040 [P] [US2] Create TrendDirection enum in src/BlazorBaseTemplate/Domain/Entities/TrendDirection.cs
+- [ ] T040 [P] [US2] Create DashboardMetric.cs record in src/BlazorBaseTemplate.Domain/Entities/DashboardMetric.cs (Constitution IX: record type, required/init, file-scoped namespace; use MetricColor enum — NOT MudBlazor.Color — to keep Domain dependency-free per Constitution I)
+- [ ] T041 [P] [US2] Create TrendDirection.cs enum in src/BlazorBaseTemplate.Domain/Entities/TrendDirection.cs
+- [ ] T041b [P] [US2] Create MetricColor.cs enum in src/BlazorBaseTemplate.Domain/Entities/MetricColor.cs (Primary, Secondary, Success, Warning, Error, Info)
 
 ### bUnit Tests for User Story 2
 
-- [X] T041 [P] [US2] Create bUnit test for MetricCard in tests/BlazorBaseTemplate.Tests/ComponentTests/Dashboard/MetricCardTests.cs (test parameter binding, trend display)
-- [X] T042 [P] [US2] Create bUnit test for Dashboard page in tests/BlazorBaseTemplate.Tests/ComponentTests/Dashboard/DashboardTests.cs (test metric rendering)
+- [ ] T042 [P] [US2] Create bUnit test for MetricCard in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/MetricCardTests.cs (test parameter binding, trend display, null icon handling, MetricColor→MudBlazor.Color mapping)
+- [ ] T043 [P] [US2] Create bUnit test for Dashboard page in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/DashboardTests.cs (test 4 metric cards render, responsive grid)
+- [ ] T043b [P] [US2] Create bUnit test for WelcomeSection in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/WelcomeSectionTests.cs (test welcome message renders)
 
 ### Implementation for User Story 2
 
-- [X] T043 [P] [US2] Create MetricCard.razor component in src/BlazorBaseTemplate/Presentation/Features/Dashboard/Components/MetricCard.razor
-- [X] T044 [US2] Implement MetricCard parameter binding (@Parameter DashboardMetric Metric) in MetricCard.razor
-- [X] T045 [US2] Add MudCard with icon, title, value rendering in MetricCard.razor (depends on T043)
-- [X] T046 [US2] Implement trend indicator display (arrow + percentage) in MetricCard.razor
-- [X] T047 [P] [US2] Create WelcomeSection.razor component in src/BlazorBaseTemplate/Presentation/Features/Dashboard/Components/WelcomeSection.razor
-- [X] T048 [P] [US2] Create Dashboard.razor page in src/BlazorBaseTemplate/Presentation/Features/Dashboard/Dashboard.razor with @page "/"
-- [X] T049 [US2] Create Dashboard.razor.cs code-behind with sample DashboardMetric data generation
-- [X] T050 [US2] Implement responsive MudGrid in Dashboard.razor (xs=12, sm=6, md=4, lg=3 for cards)
-- [X] T051 [US2] Render WelcomeSection and 4 MetricCard components in Dashboard.razor
-- [X] T052 [US2] Add sample metrics: "Total Users", "Active Projects", "Completion Rate", "Revenue"
-- [X] T053 [US2] Verify all bUnit tests pass and responsive grid works at mobile/tablet/desktop breakpoints
-- [X] T054 [US2] Refactor Dashboard page for clean code and reusability
+- [ ] T044 [P] [US2] Create MetricCard.razor component in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/MetricCard.razor with MudCard, icon, title, value, trend indicator (map MetricColor → MudBlazor.Color for rendering)
+- [ ] T045 [P] [US2] Create WelcomeSection.razor component in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/WelcomeSection.razor
+- [ ] T046 [US2] Create Dashboard.razor page in src/BlazorBaseTemplate.Web/Features/Dashboard/Dashboard.razor with @page "/" and responsive MudGrid (xs=12, sm=6, md=4, lg=3)
+- [ ] T047 [US2] Create Dashboard.razor.cs code-behind with sample DashboardMetric data (4 metrics: Total Users, Active Projects, Completion Rate, Revenue)
+- [ ] T048 [US2] Verify all US2 bUnit tests pass and responsive grid works at mobile/tablet/desktop breakpoints, refactor
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - navigation + dashboard
+**Checkpoint**: User Stories 1 AND 2 both work independently — navigation + dashboard
 
 ---
 
-## Phase 5: User Story 3 - Data Fetching Example Page (Priority: P3)
+## Phase 5: User Story 3 — Data Fetching Example Page (Priority: P3)
 
-**Goal**: Demonstrate async data fetching with loading states and service injection patterns
+**Goal**: Demonstrate async data fetching with loading states, error handling, and service injection patterns
 
-**Independent Test**: Navigate to "/data" route, verify loading spinner appears then data table displays
+**Independent Test**: Navigate to "/data" route, verify loading spinner appears, then data table displays with sample records
 
 ### Domain & Application for User Story 3
 
-- [X] T055 [P] [US3] Create SampleDataItem.cs entity in src/BlazorBaseTemplate/Domain/Entities/SampleDataItem.cs
-- [X] T056 [P] [US3] Create ISampleDataService.cs interface in src/BlazorBaseTemplate/Application/Interfaces/ISampleDataService.cs
-- [X] T057 [US3] Create SampleDataService.cs implementation in src/BlazorBaseTemplate/Application/Services/SampleDataService.cs with simulated data
-- [X] T058 [US3] Implement GetSampleDataAsync() method with Task.Delay(500) and hardcoded sample data
-- [X] T059 [US3] Implement GetByIdAsync(int id) method in SampleDataService.cs
-- [X] T060 [US3] Register ISampleDataService as Scoped in src/BlazorBaseTemplate/Presentation/Program.cs
+- [ ] T049 [P] [US3] Create SampleDataItem.cs record in src/BlazorBaseTemplate.Domain/Entities/SampleDataItem.cs (Constitution IX: record type, required/init, DateOnly)
+- [ ] T050 [P] [US3] Create ISampleDataService.cs interface in src/BlazorBaseTemplate.Application/Interfaces/ISampleDataService.cs (GetSampleDataAsync with CancellationToken)
+- [ ] T051 [US3] Create SampleDataService.cs implementation in src/BlazorBaseTemplate.Application/Services/SampleDataService.cs with Task.Delay(500) simulated data
+- [ ] T052 [US3] Register ISampleDataService as Scoped in src/BlazorBaseTemplate.Web/Program.cs
 
-### bUnit Tests for User Story 3
+### Tests for User Story 3
 
-- [X] T061 [P] [US3] Create bUnit test for DataTable in tests/BlazorBaseTemplate.Tests/ComponentTests/DataExample/DataTableTests.cs (test loading, empty, data states)
-- [X] T062 [P] [US3] Create bUnit test for LoadingPlaceholder in tests/BlazorBaseTemplate.Tests/ComponentTests/DataExample/LoadingPlaceholderTests.cs (test spinner/skeleton rendering)
-- [X] T063 [P] [US3] Create unit test for SampleDataService in tests/BlazorBaseTemplate.Tests/UnitTests/Services/SampleDataServiceTests.cs (test data retrieval)
+- [ ] T053 [P] [US3] Create unit test for SampleDataService in tests/BlazorBaseTemplate.Application.Tests/Services/SampleDataServiceTests.cs (test data retrieval, cancellation)
+- [ ] T054 [P] [US3] Create bUnit test for DataTable in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/DataExample/DataTableTests.cs (test loading state, empty state, data rendering, error state with MudAlert)
+- [ ] T055 [P] [US3] Create bUnit test for LoadingPlaceholder in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/DataExample/LoadingPlaceholderTests.cs
+- [ ] T055b [P] [US3] Create bUnit test for DataExample page in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/DataExample/DataExampleTests.cs (test error handling: when ISampleDataService throws, verify MudAlert with Severity.Error renders)
 
 ### Implementation for User Story 3
 
-- [X] T064 [P] [US3] Create LoadingType enum in src/BlazorBaseTemplate/Presentation/Features/DataExample/Components/LoadingType.cs
-- [X] T065 [P] [US3] Create LoadingPlaceholder.razor component in src/BlazorBaseTemplate/Presentation/Features/DataExample/Components/LoadingPlaceholder.razor
-- [X] T066 [US3] Implement LoadingPlaceholder with switch for Spinner/Skeleton/Linear types (depends on T064, T065)
-- [X] T067 [P] [US3] Create DataTable.razor component in src/BlazorBaseTemplate/Presentation/Features/DataExample/Components/DataTable.razor
-- [X] T068 [US3] Implement DataTable parameter binding (Items, IsLoading, OnRowClick, HidePagination) in DataTable.razor
-- [X] T069 [US3] Add MudTable with SampleDataItem columns (Id, Name, Status, Value, CreatedDate) in DataTable.razor (depends on T067)
-- [X] T070 [US3] Implement loading state with MudSkeleton in DataTable.razor
-- [X] T071 [US3] Implement empty state message in DataTable.razor
-- [X] T072 [P] [US3] Create DataExample.razor page in src/BlazorBaseTemplate/Presentation/Features/DataExample/DataExample.razor with @page "/data"
-- [X] T073 [US3] Create DataExample.razor.cs code-behind with @inject ISampleDataService
-- [X] T074 [US3] Implement OnInitializedAsync() with loading state management in DataExample.razor.cs
-- [X] T075 [US3] Call DataService.GetSampleDataAsync() and handle loading/success states in DataExample.razor.cs
-- [X] T076 [US3] Render DataTable component with fetched items and loading state in DataExample.razor
-- [X] T077 [US3] Add error handling with try-catch and error message display
-- [X] T078 [US3] Update NavMenu.razor to include link to "/data" route
-- [X] T079 [US3] Verify all bUnit tests pass and async pattern works correctly
-- [X] T080 [US3] Refactor DataExample page and DataTable component for clean architecture
+- [ ] T056 [P] [US3] Create LoadingPlaceholder.razor component in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingPlaceholder.razor with MudProgressCircular
+- [ ] T057 [P] [US3] Create DataTable.razor component in src/BlazorBaseTemplate.Web/Features/DataExample/Components/DataTable.razor with MudTable<SampleDataItem> columns
+- [ ] T058 [US3] Implement loading state (MudSkeleton) and empty state message in DataTable.razor
+- [ ] T059 [US3] Create DataExample.razor page in src/BlazorBaseTemplate.Web/Features/DataExample/DataExample.razor with @page "/data"
+- [ ] T060 [US3] Create DataExample.razor.cs code-behind with @inject ISampleDataService, OnInitializedAsync loading/error handling, try-catch pattern
+- [ ] T061 [US3] Add MudNavLink for "/data" route to NavMenu.razor in src/BlazorBaseTemplate.Web/Features/Shared/NavMenu.razor
+- [ ] T062 [US3] Verify all US3 bUnit + unit tests pass, refactor for clean architecture
 
-**Checkpoint**: All user stories should now be independently functional - layout, dashboard, and data fetching all work
+**Checkpoint**: All 3 user stories independently functional — layout, dashboard, and data fetching all work
 
 ---
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-**Purpose**: Improvements that affect multiple user stories and finalize the template
+**Purpose**: Final improvements affecting multiple user stories and template completeness
 
-- [X] T081 [P] Update README.md with comprehensive setup instructions, architecture diagram, and customization guide
-- [X] T082 [P] Create CHANGELOG.md documenting template version 1.0.0
-- [X] T083 [P] Add inline code comments in MainLayout.razor documenting MudDrawer usage patterns
-- [X] T084 [P] Add inline code comments in DataExample.razor documenting async service injection pattern
-- [X] T085 [P] Create ServiceRegistration.cs helper in src/BlazorBaseTemplate/Infrastructure/Configuration/ for DI organization
-- [X] T086 Verify all features work: run `dotnet run` from src/BlazorBaseTemplate and manually test all routes and responsive behavior
-- [X] T087 Run all bUnit tests: `dotnet test` from solution root and verify 80%+ code coverage
-- [X] T088 Build release version: `dotnet publish -c Release` and verify download size <2MB
-- [X] T089 [P] Test accessibility with browser dev tools (WCAG 2.1 AA compliance via MudBlazor)
-- [X] T090 [P] Test hot reload functionality: make change, verify instant update
-- [X] T091 [P] Add XML documentation comments to public component parameters
-- [X] T092 Verify deep linking works: navigate directly to "/data" URL and verify page loads
-- [X] T093 Test on multiple browsers: Chrome, Firefox, Safari, Edge
-- [X] T094 [P] Create deployment guide in README.md for Azure Static Web Apps, Netlify, GitHub Pages
-- [X] T095 Final code review and refactoring for consistency
+- [ ] T063 [P] Update README.md with comprehensive setup instructions, 4-project architecture diagram, dependency rules, and customization guide
+- [ ] T064 [P] Create CHANGELOG.md documenting template version 1.0.0
+- [ ] T065 [P] Add inline code comments in MainLayout.razor documenting MudDrawer usage and responsive patterns
+- [ ] T066 [P] Add inline code comments in DataExample.razor documenting async service injection pattern
+- [ ] T067 [P] Add XML documentation comments to public component parameters in MetricCard.razor and DataTable.razor
+- [ ] T068 Verify full solution builds: `dotnet build` from repository root (all 8 projects compile)
+- [ ] T069 Run all bUnit + unit tests: `dotnet test` from repository root and verify 80%+ code coverage
+- [ ] T070 Build release: `dotnet publish src/BlazorBaseTemplate.Web -c Release` and verify download size <2MB
+- [ ] T071 [P] Test deep linking: navigate directly to "/data" URL and verify page loads correctly
+- [ ] T072 [P] Test hot reload: `dotnet watch --project src/BlazorBaseTemplate.Web` and verify live updates
+- [ ] T073 [P] Test accessibility with browser dev tools (WCAG 2.1 AA via MudBlazor built-in support)
+- [ ] T074 Test on multiple browsers: Chrome, Firefox, Safari, Edge
+- [ ] T075 Final code review: verify all files ≤200 lines, record types for entities, file-scoped namespaces, _camelCase fields (Constitution IX + X)
 
 ---
 
@@ -195,92 +181,38 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3-5)**: All depend on Foundational phase completion
-  - User Story 1 (P1) can start after Foundational - No dependencies on other stories
-  - User Story 2 (P2) can start after Foundational - Requires US1 for navigation structure
-  - User Story 3 (P3) can start after Foundational - Requires US1 for navigation structure
-- **Polish (Phase 6)**: Depends on all user stories being complete
+```text
+Phase 1 (Setup)        → No dependencies — start immediately
+Phase 2 (Foundational) → Depends on Phase 1 completion — BLOCKS all user stories
+Phase 3 (US1 - P1)     → Depends on Phase 2 — provides layout for all pages
+Phase 4 (US2 - P2)     → Depends on Phase 2 + US1 layout (T034-T038)
+Phase 5 (US3 - P3)     → Depends on Phase 2 + US1 layout (T034-T038)
+Phase 6 (Polish)        → Depends on all user stories complete
+```
 
 ### User Story Dependencies
 
-- **User Story 1 (P1) - Layout & Navigation**: Can start after Foundational (Phase 2) - Foundation for all pages
-- **User Story 2 (P2) - Dashboard**: Can start after Foundational, integrates with US1 navigation
-- **User Story 3 (P3) - Data Example**: Can start after Foundational, integrates with US1 navigation
+- **US1 (Layout)**: Can start immediately after Phase 2 — foundation for all pages
+- **US2 (Dashboard)**: Can start after Phase 2, integrates with US1 MainLayout
+- **US3 (Data Example)**: Can start after Phase 2, integrates with US1 NavMenu
 
-### Within Each User Story
+### Within Each User Story (TDD Flow)
 
-- bUnit tests MUST be written FIRST and FAIL before implementation (TDD Red)
-- Domain entities before services
-- Service interfaces before implementations
-- Service registration before component usage
-- Components before pages
-- Pages before adding to navigation
-- Verify tests pass after implementation (TDD Green)
-- Refactor for clarity (TDD Refactor)
+1. Domain entities (if any) — create first
+2. bUnit/unit tests — write FIRST, ensure they FAIL (TDD Red)
+3. Service interfaces → implementations
+4. Service DI registration
+5. Components → pages
+6. Verify tests pass (TDD Green) → Refactor
 
-### Parallel Opportunities
+### Parallel Opportunities Per Phase
 
-**Phase 1 (Setup)**: Tasks T002, T006, T007, T008, T009, T011, T012, T014 can run in parallel (after solution and folders created)  
-**Phase 2 (Foundational)**: Tasks T017, T018, T019, T021, T022, T023 can run in parallel
-
-**User Story 1**:
-- Tests T026, T027 can run in parallel
-- Components T028, T032, T034 can be developed in parallel by different developers
-
-**User Story 2**:
-- Entities T039, T040 can run in parallel
-- Tests T041, T042 can run in parallel
-- Components T043, T047, T048 can be developed in parallel
-
-**User Story 3**:
-- Entities T055, T056 can run in parallel
-- Tests T061, T062, T063 can run in parallel
-- Components T064, T065, T067, T072 can be developed in parallel
-
-**Phase 6 (Polish)**: Tasks T081, T082, T083, T084, T085, T089, T090, T091, T094 can run in parallel
-
----
-
-## Parallel Example: User Story 1 (Layout & Navigation)
-
-```bash
-# Developer A: Write bUnit tests
-Task T021: MainLayoutTests.cs
-Task T022: NavMenuTests.cs
-
-# Developer B: Create components
-Task T023: MainLayout.razor
-Task T027: NavMenu.razor
-Task T029: AppLogo.razor
-
-# After both complete:
-Task T024-T026: Implement MainLayout logic
-Task T028: Add navigation links
-Task T030-T033: Integration and testing
-```
-
----
-
-## Parallel Example: User Story 2 (Dashboard)
-
-```bash
-# Developer A: Domain entities and tests
-Task T034: DashboardMetric.cs
-Task T035: TrendDirection.cs
-Task T036: MetricCardTests.cs
-Task T037: DashboardTests.cs
-
-# Developer B: Components
-Task T038: MetricCard.razor
-Task T042: WelcomeSection.razor
-Task T043: Dashboard.razor
-
-# After both complete:
-Task T039-T041: MetricCard implementation
-Task T044-T049: Dashboard integration
-```
+**Phase 1**: T002, T004, T005 (after T003); T009-T012 parallel; T014-T020 parallel
+**Phase 2**: T022-T030 parallel (after T021)
+**Phase 3 (US1)**: T032+T033 parallel; T034+T036+T037 parallel
+**Phase 4 (US2)**: T040+T041 parallel; T042+T043 parallel; T044+T045 parallel
+**Phase 5 (US3)**: T049+T050 parallel; T053+T054+T055 parallel; T056+T057 parallel
+**Phase 6**: T063-T067+T071-T073 parallel
 
 ---
 
@@ -288,60 +220,24 @@ Task T044-T049: Dashboard integration
 
 ### MVP First (User Story 1 Only)
 
-1. Complete Phase 1: Setup (T001-T010)
-2. Complete Phase 2: Foundational (T011-T020) - CRITICAL
-3. Complete Phase 3: User Story 1 (T021-T033)
-4. **STOP and VALIDATE**: Test responsive layout independently
+1. Complete Phase 1: Setup (T001-T020)
+2. Complete Phase 2: Foundational (T021-T031) — CRITICAL
+3. Complete Phase 3: User Story 1 (T032-T039)
+4. **STOP and VALIDATE**: Run app, test responsive layout independently
 5. Deploy/demo if ready
 
 ### Incremental Delivery
 
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP with navigation!)
-3. Add User Story 2 → Test independently → Deploy/Demo (MVP + Dashboard!)
-4. Add User Story 3 → Test independently → Deploy/Demo (Complete template!)
+1. Setup + Foundational → Foundation ready (8 projects compile)
+2. Add User Story 1 → Test independently → MVP with navigation
+3. Add User Story 2 → Test independently → MVP + Dashboard
+4. Add User Story 3 → Test independently → Complete template
 5. Add Polish → Final release
 
-### Parallel Team Strategy
+### Cost Optimization Reminder (Constitution X)
 
-With 3 developers:
-
-1. Team completes Setup + Foundational together (T001-T020)
-2. Once Foundational is done:
-   - **Developer A**: User Story 1 (T021-T033) - Layout & Navigation
-   - **Developer B**: User Story 2 (T034-T049) - Dashboard (needs T027-T028 first)
-   - **Developer C**: User Story 3 (T050-T075) - Data Example (needs T027-T028 first)
-3. Team completes Polish together (T076-T090)
-
-**Note**: User Stories 2 and 3 need basic navigation from US1, so coordinate T027-T028 completion first.
-
----
-
-## Notes
-
-- **[P] tasks**: Different files, no dependencies - can run in parallel
-- **[Story] labels**: Maps task to specific user story for traceability (US1, US2, US3)
-- **TDD workflow**: Write tests first → See them fail (Red) → Implement → Pass (Green) → Refactor
-- **Independent stories**: Each user story delivers value independently
-- **Commit frequently**: After each task or logical group
-- **Checkpoints**: Stop at each checkpoint to validate story works independently
-- **MudBlazor focus**: Using MudBlazor components instead of Tailwind (justified in plan.md)
-- **WASM optimization**: Enable trimming (T019) to keep download <2MB
-- **Avoid**: Vague tasks, same file conflicts, cross-story dependencies that break independence
-
----
-
-## Task Count Summary
-
-- **Phase 1 (Setup)**: 10 tasks
-- **Phase 2 (Foundational)**: 10 tasks (BLOCKING)
-- **Phase 3 (User Story 1 - MVP)**: 13 tasks
-- **Phase 4 (User Story 2)**: 16 tasks
-- **Phase 5 (User Story 3)**: 26 tasks
-- **Phase 6 (Polish)**: 15 tasks
-
-**Total**: 90 tasks
-
-**Parallel opportunities**: ~30 tasks marked [P] can run concurrently
-**Critical path**: Setup → Foundational → US1 → US2 → US3 → Polish
-**Estimated effort**: 40-60 hours for complete implementation (including tests)
+Before running `/speckit.implement`, ALWAYS execute:
+1. `/speckit.checklist` — Catch specification gaps
+2. `/speckit.analyze` — Cross-artifact consistency check
+3. Fix ALL issues surfaced
+4. ONLY THEN proceed with `/speckit.implement`

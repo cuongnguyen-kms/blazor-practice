@@ -257,3 +257,134 @@ Document technical decisions, best practices research, and alternatives consider
 5. → Update agent context with MudBlazor, WebAssembly knowledge
 
 **Checkpoint**: Research phase complete. Ready to proceed to design phase.
+
+---
+
+## Decision 7: 4-Project Clean Architecture (Constitution v1.2.0)
+
+**Decision**: Split the single `BlazorBaseTemplate` project into 4 separate .csproj projects with enforced dependency rules.
+
+**Rationale**:
+- Constitution I (v1.2.0) explicitly states: "Single-project 'folder organization' is NOT permitted as it allows dependency violations"
+- Separate .csproj files enforce dependency boundaries at compile-time — Domain physically cannot reference Infrastructure
+- Aligns with industry-standard .NET Clean Architecture (Jason Taylor, Steve Smith templates)
+- The template serves as a company standard — enforcing at project level prevents architectural drift across teams
+
+**Migration from Single-Project**:
+| Old (Folder in BlazorBaseTemplate/) | New (Separate Project) | Type | Dependencies |
+|---|---|---|---|
+| `Domain/Entities/` | `BlazorBaseTemplate.Domain` | Class Library | None |
+| `Application/Interfaces/`, `Application/Services/` | `BlazorBaseTemplate.Application` | Class Library | Domain |
+| `Infrastructure/Configuration/` | `BlazorBaseTemplate.Infrastructure` | Class Library | Application, Domain |
+| `Presentation/**` | `BlazorBaseTemplate.Web` | Blazor WASM | Infrastructure, Application, Domain |
+
+**Alternatives Considered**:
+1. **Keep single project, add Architecture Tests (ArchUnitNET)**: Would catch violations in tests but not at compile-time. Developers can still write bad code that compiles. Rejected — Constitution is explicit.
+2. **3-project split (Domain, Application, Web)**: Skip Infrastructure since template has no real I/O. Rejected — Constitution requires exactly 4 projects, and Infrastructure placeholder teaches the pattern.
+
+---
+
+## Decision 8: .Web vs .Presentation Naming (Constitution v1.2.0)
+
+**Decision**: Use `.Web` suffix instead of `.Presentation` for the Blazor project.
+
+**Rationale**:
+- Constitution I (v1.2.0) explicitly defines the 4 projects as `.Domain`, `.Application`, `.Infrastructure`, `.Web`
+- `.Web` is more concise and standard in .NET project templates
+- Feature-based folder structure (`Features/Dashboard/`, `Features/DataExample/`) remains inside the `.Web` project
+
+**Alternatives Considered**:
+1. **Keep `.Presentation`**: Conflicts with Constitution I which specifies `.Web`. Rejected.
+
+---
+
+## Decision 9: Test Project Split — 1 → 4 (Constitution v1.2.0)
+
+**Decision**: Split single `BlazorBaseTemplate.Tests` into 4 test projects mirroring production layers.
+
+**Rationale**:
+- Constitution VII (v1.2.0): "Solution MUST create 4 corresponding test projects"
+- Each test project references only its matching production project
+- Enables per-layer test execution: `dotnet test --filter BlazorBaseTemplate.Domain.Tests`
+
+**Test Distribution**:
+| Test Project | Contents | Notes |
+|---|---|---|
+| `BlazorBaseTemplate.Domain.Tests` | Entity record tests, value object equality | Minimal for base template |
+| `BlazorBaseTemplate.Application.Tests` | `SampleDataService` tests | Core service tests |
+| `BlazorBaseTemplate.Infrastructure.Tests` | Configuration extension tests | Minimal for base template |
+| `BlazorBaseTemplate.Web.Tests` | bUnit component tests (MetricCard, DataTable, MainLayout, NavMenu) | Bulk of tests |
+
+---
+
+## Decision 10: Router AdditionalAssemblies (Constitution v1.2.0)
+
+**Decision**: Configure `App.razor` Router with `AdditionalAssemblies` referencing the Web project assembly.
+
+**Rationale**:
+- Constitution VIII (v1.2.0, NON-NEGOTIABLE): Router MUST include `AdditionalAssemblies`
+- Prevents the common "404 on valid routes" bug in multi-assembly Blazor apps
+- Pattern is already established if future features add pages to other assemblies
+
+**Implementation**:
+```razor
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="new[] { typeof(App).Assembly }">
+```
+
+---
+
+## Decision 11: launchSettings.json for F5-Ready Experience (Constitution v1.2.0)
+
+**Decision**: Include `Properties/launchSettings.json` in the `.Web` project with HTTPS and HTTP profiles.
+
+**Rationale**:
+- Constitution VII (v1.2.0): ".Web project MUST include a properly configured Properties/launchSettings.json"
+- Enables zero-config developer experience: clone → open .sln → F5
+- Standard Blazor WASM launch profiles include `https` and `http` configurations
+
+---
+
+## Decision 12: C# Coding Standards (Constitution v1.3.0)
+
+**Decision**: Apply C# coding best practices to all generated code.
+
+**Key Rules Enforced**:
+- Entity types (`DashboardMetric`, `SampleDataItem`) implemented as `record` types (immutable)
+- File-scoped namespaces in all `.cs` files
+- One type per file, file name matches type name
+- Private fields use `_camelCase` convention
+- Async methods suffixed with `Async`; `CancellationToken` parameter on async interfaces
+- `nameof()` in `ArgumentNullException` throws
+- Nullable reference types enabled in all 4 .csproj files
+- Methods ≤ 30 lines, classes ≤ 200 lines
+
+---
+
+## Decision 13: Cost Optimization Workflow (Constitution v1.3.0)
+
+**Decision**: Adopt the dry-run validation pipeline for all implementation cycles.
+
+**Mandatory Workflow**:
+```
+/speckit.checklist → /speckit.analyze → Fix issues → /speckit.implement
+```
+
+**Implementation Impact**:
+- Tasks must list specific files created/modified per task (delta-updates)
+- Files must be ≤ 200 lines to minimize token context
+- The 4-project structure naturally produces smaller, focused files — aligns with cost optimization
+- Never regenerate entire project; use targeted file edits
+
+---
+
+## Updated Risk Mitigation
+
+| Risk | Mitigation |
+|------|-----------|
+| Empty Infrastructure/Domain.Tests projects feel pointless | Include README explaining they scaffold the pattern for real projects |
+| More projects = more build time | .NET incremental build only recompiles changed projects |
+| MudBlazor breaking changes | Pin to specific major version (7.x), document upgrade path in README |
+| Large download size | Enable trimming, document optimization in quickstart.md |
+| Developers confused by 4 projects for a "simple template" | README architecture section explains why + Constitution reference |
+| bUnit tests break with MudBlazor updates | Keep tests simple, document MudBlazor test setup pattern |

@@ -16,7 +16,7 @@ Define the domain entities and data structures used in the Blazor WebAssembly ba
 
 **Purpose**: Represents a generic data item used in the data fetching example page to demonstrate async data loading, service injection, and table rendering patterns.
 
-**Location**: `Domain/Entities/SampleDataItem.cs`
+**Location**: `src/BlazorBaseTemplate.Domain/Entities/SampleDataItem.cs`
 
 **Properties**:
 
@@ -25,20 +25,22 @@ Define the domain entities and data structures used in the Blazor WebAssembly ba
 | Id | int | No | Unique identifier for the data item | Must be > 0 |
 | Name | string | No | Display name of the item | Required, max 100 characters |
 | Description | string | Yes | Optional detailed description | Max 500 characters |
-| CreatedDate | DateTime | No | Timestamp when item was created | Cannot be future date |
+| CreatedDate | DateOnly | No | Date when item was created | Cannot be future date |
 | Status | string | No | Current status (e.g., "Active", "Inactive", "Pending") | Must be from enumerated list |
 | Value | decimal | Yes | Optional numeric value (e.g., price, score, metric) | Must be >= 0 if provided |
 
-**Example**:
+**Example** (Constitution IX — record type, file-scoped namespace, required/init):
 ```csharp
-public class SampleDataItem
+namespace BlazorBaseTemplate.Domain.Entities;
+
+public record SampleDataItem
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public string Status { get; set; } = "Active";
-    public decimal? Value { get; set; }
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+    public string? Description { get; init; }
+    public required DateOnly CreatedDate { get; init; }
+    public required string Status { get; init; } = "Active";
+    public decimal? Value { get; init; }
 }
 ```
 
@@ -55,7 +57,7 @@ public class SampleDataItem
 
 **Purpose**: Represents a metric/KPI displayed on the dashboard home page using the `MetricCard` component. Demonstrates component parameter binding and responsive grid layouts.
 
-**Location**: `Domain/Entities/DashboardMetric.cs`
+**Location**: `src/BlazorBaseTemplate.Domain/Entities/DashboardMetric.cs`
 
 **Properties**:
 
@@ -66,11 +68,14 @@ public class SampleDataItem
 | Icon | string | Yes | MudBlazor icon name (e.g., "Icons.Material.Filled.People") | Must be valid MudBlazor icon path if provided |
 | TrendDirection | TrendDirection | Yes | Upward, Downward, or Neutral trend indicator | Enum value |
 | TrendPercentage | decimal | Yes | Percentage change (e.g., +5.2, -3.1) | Optional, used with TrendDirection |
-| Color | Color | No | MudBlazor color for card theming (Primary, Secondary, Success, etc.) | Must be valid MudBlazor Color enum |
+| Color | MetricColor | No | Domain color enum for card theming (Primary, Secondary, Success, etc.) | Must be valid MetricColor enum value |
 
 **Enums**:
 
+`src/BlazorBaseTemplate.Domain/Entities/TrendDirection.cs`:
 ```csharp
+namespace BlazorBaseTemplate.Domain.Entities;
+
 public enum TrendDirection
 {
     Neutral = 0,
@@ -79,17 +84,37 @@ public enum TrendDirection
 }
 ```
 
-**Example**:
+`src/BlazorBaseTemplate.Domain/Entities/MetricColor.cs`:
 ```csharp
-public class DashboardMetric
+namespace BlazorBaseTemplate.Domain.Entities;
+
+public enum MetricColor
 {
-    public string Title { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
-    public string? Icon { get; set; }
-    public TrendDirection? TrendDirection { get; set; }
-    public decimal? TrendPercentage { get; set; }
-    public Color Color { get; set; } = Color.Primary;
+    Primary,
+    Secondary,
+    Success,
+    Warning,
+    Error,
+    Info
 }
+```
+
+**Example** (Constitution IX — record type, file-scoped namespace, required/init):
+```csharp
+namespace BlazorBaseTemplate.Domain.Entities;
+
+public record DashboardMetric
+{
+    public required string Title { get; init; }
+    public required string Value { get; init; }
+    public string? Icon { get; init; }
+    public TrendDirection? TrendDirection { get; init; }
+    public decimal? TrendPercentage { get; init; }
+    public MetricColor Color { get; init; } = MetricColor.Primary;
+}
+```
+
+**Note**: The Web layer's `MetricCard.razor` maps `MetricColor` to `MudBlazor.Color` for rendering. This keeps Domain free of UI dependencies (Constitution I).
 ```
 
 **Usage**:
@@ -124,7 +149,7 @@ public class DashboardMetric
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    Dashboard.razor                       │
-│  (Presentation/Features/Dashboard/Dashboard.razor)      │
+│  (src/BlazorBaseTemplate.Web/Features/Dashboard/)       │
 │                                                           │
 │  OnInitializedAsync():                                   │
 │    - Generate List<DashboardMetric> sample data         │
@@ -134,7 +159,7 @@ public class DashboardMetric
                             ▼
 ┌─────────────────────────────────────────────────────────┐
 │                   MetricCard.razor                       │
-│  (Presentation/Features/Dashboard/Components/)          │
+│  (src/BlazorBaseTemplate.Web/Features/Dashboard/Components/) │
 │                                                           │
 │  [Parameter] DashboardMetric Metric                     │
 │  - Display Title, Value, Icon, Trend                    │
@@ -144,7 +169,7 @@ public class DashboardMetric
 
 ┌─────────────────────────────────────────────────────────┐
 │                  DataExample.razor                       │
-│  (Presentation/Features/DataExample/DataExample.razor)  │
+│  (src/BlazorBaseTemplate.Web/Features/DataExample/)     │
 │                                                           │
 │  @inject ISampleDataService DataService                 │
 │                                                           │
@@ -155,14 +180,14 @@ public class DashboardMetric
 │    - Render MudTable<SampleDataItem>                    │
 └─────────────────────────────────────────────────────────┘
                             │
-                            │ ISampleDataService
+                            │ ISampleDataService (src/BlazorBaseTemplate.Application/Interfaces/)
                             ▼
 ┌─────────────────────────────────────────────────────────┐
 │              SampleDataService.cs                        │
-│  (Application/Services/SampleDataService.cs)            │
+│  (src/BlazorBaseTemplate.Application/Services/)         │
 │                                                           │
-│  GetSampleDataAsync():                                   │
-│    - await Task.Delay(500) // Simulate network          │
+│  GetSampleDataAsync(CancellationToken):                  │
+│    - await Task.Delay(500, ct) // Simulate network      │
 │    - return List<SampleDataItem> with hardcoded data    │
 └─────────────────────────────────────────────────────────┘
 ```
