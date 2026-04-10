@@ -1,0 +1,67 @@
+@using BlazorBaseTemplate.Domain.Entities
+
+<MudCard Elevation="@Elevation" Class="@Class" @onclick="HandleClick">
+    <MudCardContent>
+        <div class="d-flex align-center gap-4">
+            @if (Metric.Icon is not null)
+            {
+                <MudIcon Icon="@Metric.Icon" Color="@MapColor(Metric.Color)" Size="Size.Large" />
+            }
+            <div>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">@Metric.Title</MudText>
+                <MudText Typo="Typo.h5">@Metric.Value</MudText>
+            </div>
+        </div>
+        @if (Metric.TrendDirection is not null)
+        {
+            <div class="d-flex align-center mt-2 trend-indicator">
+                <MudIcon Icon="@GetTrendIcon()" Color="@GetTrendColor()" Size="Size.Small" />
+                <MudText Typo="Typo.caption" Color="@GetTrendColor()">
+                    @(Metric.TrendPercentage?.ToString("0.0"))%
+                </MudText>
+            </div>
+        }
+    </MudCardContent>
+</MudCard>
+
+@code {
+    /// <summary>The metric data to display (title, value, icon, trend).</summary>
+    [Parameter, EditorRequired] public DashboardMetric Metric { get; set; } = default!;
+    /// <summary>Optional callback when card is clicked (for drilldown).</summary>
+    [Parameter] public EventCallback OnClick { get; set; }
+    /// <summary>MudBlazor elevation (0-25) for card shadow depth.</summary>
+    [Parameter] public int Elevation { get; set; } = 2;
+    /// <summary>Additional CSS classes to apply to the card.</summary>
+    [Parameter] public string Class { get; set; } = "";
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+
+    private static MudBlazor.Color MapColor(MetricColor color) => color switch
+    {
+        MetricColor.Primary => MudBlazor.Color.Primary,
+        MetricColor.Secondary => MudBlazor.Color.Secondary,
+        MetricColor.Success => MudBlazor.Color.Success,
+        MetricColor.Warning => MudBlazor.Color.Warning,
+        MetricColor.Error => MudBlazor.Color.Error,
+        MetricColor.Info => MudBlazor.Color.Info,
+        _ => MudBlazor.Color.Default
+    };
+
+    private string GetTrendIcon() => Metric.TrendDirection switch
+    {
+        TrendDirection.Upward => Icons.Material.Filled.TrendingUp,
+        TrendDirection.Downward => Icons.Material.Filled.TrendingDown,
+        _ => Icons.Material.Filled.TrendingFlat
+    };
+
+    private MudBlazor.Color GetTrendColor() => Metric.TrendDirection switch
+    {
+        TrendDirection.Upward => MudBlazor.Color.Success,
+        TrendDirection.Downward => MudBlazor.Color.Error,
+        _ => MudBlazor.Color.Default
+    };
+}

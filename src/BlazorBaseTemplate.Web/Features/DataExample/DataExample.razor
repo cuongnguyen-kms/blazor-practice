@@ -1,0 +1,18 @@
+@page "/data"
+@using BlazorBaseTemplate.Web.Features.DataExample.Components
+@* Demonstrates async service injection via @inject ISampleDataService in code-behind.
+   Uses try-catch in OnInitializedAsync for error handling with MudAlert feedback. *@
+
+<PageTitle>Data Example</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Data Fetching Example</MudText>
+<MudText Typo="Typo.body1" Class="mud-text-secondary mb-6">
+    Demonstrates async data fetching with loading states, error handling, and service injection.
+</MudText>
+
+@if (_errorMessage is not null)
+{
+    <MudAlert Severity="Severity.Error" Class="mb-4">@_errorMessage</MudAlert>
+}
+
+<DataTable Items="@_items" IsLoading="@_isLoading" />

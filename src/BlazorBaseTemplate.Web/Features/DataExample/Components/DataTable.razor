@@ -1,0 +1,60 @@
+@using BlazorBaseTemplate.Domain.Entities
+
+@if (IsLoading)
+{
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="40px" Class="mb-2" />
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="40px" Class="mb-2" />
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="40px" Class="mb-2" />
+}
+else if (Items is null || !Items.Any())
+{
+    <MudText Typo="Typo.body1" Class="pa-4">No data available</MudText>
+}
+else
+{
+    <MudTable Items="@Items" Hover="true" Striped="true" Dense="true">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Value</MudTh>
+            <MudTh>Created Date</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small" Color="@GetStatusColor(context.Status)">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Value">@(context.Value?.ToString("C") ?? "—")</MudTd>
+            <MudTd DataLabel="Created Date">@context.CreatedDate.ToString("yyyy-MM-dd")</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            @if (!HidePagination)
+            {
+                <MudTablePager />
+            }
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    /// <summary>Collection of data items to display in the table.</summary>
+    [Parameter, EditorRequired] public IEnumerable<SampleDataItem>? Items { get; set; }
+    /// <summary>Whether data is currently loading (shows skeleton placeholders).</summary>
+    [Parameter] public bool IsLoading { get; set; }
+    /// <summary>Callback when a row is clicked.</summary>
+    [Parameter] public EventCallback<SampleDataItem> OnRowClick { get; set; }
+    /// <summary>Hide pagination controls (show all rows).</summary>
+    [Parameter] public bool HidePagination { get; set; }
+
+    private static Color GetStatusColor(string status) => status switch
+    {
+        "Active" => Color.Success,
+        "Inactive" => Color.Error,
+        "Pending" => Color.Warning,
+        _ => Color.Default
+    };
+}
