@@ -2,7 +2,8 @@
 
 **Feature**: 001-base-template  
 **Phase**: Phase 0 - Research & Technical Decisions  
-**Date**: 2026-04-08
+**Date**: 2026-04-08  
+**Last Updated**: 2026-04-16 (Constitution v1.4.0 alignment: dark mode, glassmorphism, visual design system)
 
 ## Purpose
 
@@ -234,6 +235,18 @@ Document technical decisions, best practices research, and alternatives consider
 5. **Q**: Should we demonstrate PWA/offline capability?
    - **A**: Provide guidance in README, but don't pre-configure (SC-011 allows "clear guidance" alternative).
 
+6. **Q**: How should dark mode be persisted across sessions?
+   - **A**: Use browser localStorage via JS interop. First visit checks OS `prefers-color-scheme`, then user's explicit choice takes precedence.
+
+7. **Q**: Should glassmorphism CSS be in per-component `.razor.css` isolation or a global stylesheet?
+   - **A**: Global `wwwroot/css/app.css`. Glassmorphism applies to MudDrawer and overlays template-wide — isolation would duplicate styles.
+
+8. **Q**: How to handle `prefers-reduced-motion` across all transitions and animations?
+   - **A**: Single CSS media query block in `app.css` that sets `animation-duration` and `transition-duration` to near-zero for all elements. MudSkeleton shimmer is exempt (handled internally by MudBlazor).
+
+9. **Q**: Should rounded corners (12px) be applied via CSS or MudBlazor theme?
+   - **A**: Via `MudTheme.LayoutProperties.DefaultBorderRadius = "12px"`. This propagates to all MudCard, MudPaper, MudDialog, and other surface components automatically.
+
 ---
 
 ## Risk Mitigation
@@ -245,6 +258,9 @@ Document technical decisions, best practices research, and alternatives consider
 | Developers unfamiliar with feature structure | Provide clear README explaining organization + diagram |
 | bUnit tests break with MudBlazor updates | Keep tests simple, document MudBlazor test setup pattern |
 | WebAssembly browser compatibility | Document supported browsers in README (Chrome 57+, etc.) |
+| Google Fonts CDN unavailable | Font stack falls back to Geist → Segoe UI → system sans-serif |
+| `backdrop-filter` unsupported in old browsers | Graceful degradation: sidebar renders with solid semi-transparent background |
+| Dark mode flicker on first load | JS interop reads localStorage before Blazor renders; apply theme class in `index.html` inline script |
 
 ---
 
@@ -295,6 +311,135 @@ Document technical decisions, best practices research, and alternatives consider
 
 **Alternatives Considered**:
 1. **Keep `.Presentation`**: Conflicts with Constitution I which specifies `.Web`. Rejected.
+
+---
+
+## Decision 9: Dark Mode Theming Strategy (Constitution v1.4.0, FR-020/FR-021)
+
+**Decision**: Use **MudBlazor's built-in dual-palette theming** (`MudTheme.PaletteLight` + `MudTheme.PaletteDark`) with a runtime toggle and localStorage persistence.
+
+**Rationale**:
+- MudBlazor natively supports `IsDarkMode` on `MudThemeProvider`, toggling between `PaletteLight` and `PaletteDark` in a single theme object
+- No custom CSS dark mode classes needed — MudBlazor handles all component color swaps automatically
+- localStorage persistence via JS interop ensures preference survives page reloads/sessions
+- Initial load respects `prefers-color-scheme` media query via JS interop bootstrap
+- Toggle is <100ms perceived delay (FR-020, SC-011) — just flipping a boolean, no DOM re-render
+
+**Implementation Notes**:
+- Custom theme in `Web/Themes/CustomTheme.cs` defines both `PaletteLight` and `PaletteDark`
+- `MainLayout.razor` binds `<MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="@CustomTheme"/>`
+- `ThemeToggle.razor` component in MudAppBar toggles `_isDarkMode` via cascading parameter or callback
+- JS interop helper reads/writes `localStorage.getItem("darkMode")` and `matchMedia("(prefers-color-scheme: dark)")`
+- On first visit: check localStorage first → fall back to OS preference → default to light
+
+**Alternatives Considered**:
+1. **CSS-only dark mode with `dark:` classes**: Requires duplicating all color definitions in CSS. MudBlazor already handles this internally. Rejected — redundant work.
+2. **Server-side cookie-based persistence**: Template is client-only WASM. No server. Rejected.
+3. **Blazor `CascadingValue` for theme state**: Works but adds complexity. MudThemeProvider's `@bind-IsDarkMode` is simpler. Rejected for simplicity.
+
+---
+
+## Decision 10: Typography — Inter Font Stack (Constitution XI, FR-023)
+
+**Decision**: Load **Inter** via Google Fonts CDN in `index.html`, apply via MudBlazor `Typography` theme override.
+
+**Rationale**:
+- Inter is a purpose-built font for UI/UX with excellent legibility at small sizes (14-16px body text)
+- Google Fonts CDN provides global edge caching, reducing TTFB vs self-hosting
+- MudBlazor's `MudTheme.Typography` allows setting `Default.FontFamily` globally — all MudBlazor components inherit
+- Fallback chain: `Inter, Geist, Segoe UI, system-ui, -apple-system, sans-serif` covers Windows, macOS, Linux
+
+**Implementation Notes**:
+- Add to `wwwroot/index.html` `<head>`:
+  ```html
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  ```
+- In `CustomTheme.cs`, set:
+  ```csharp
+  Typography = new Typography { Default = new Default { FontFamily = new[] { "Inter", "Geist", "Segoe UI", "system-ui", "-apple-system", "sans-serif" } } }
+  ```
+- Heading scale: MudBlazor's default typographic scale works with Inter; customize `H1`–`H6` weights if needed
+
+**Alternatives Considered**:
+1. **Self-host Inter via `@font-face`**: Increases WASM download size. Rejected — CDN is faster for most users.
+2. **Geist as primary**: Not on Google Fonts CDN, requires self-hosting. Rejected for CDN convenience.
+3. **System fonts only**: Inconsistent appearance across OS. Rejected — Inter provides visual uniformity.
+
+---
+
+## Decision 11: Glassmorphism & Visual Aesthetics (Constitution XI, FR-024/FR-025)
+
+**Decision**: Implement glassmorphism via **supplemental CSS** in `wwwroot/css/app.css` targeting MudBlazor's `MudDrawer` and use MudTheme's `LayoutProperties.DefaultBorderRadius` for 12px rounded corners.
+
+**Rationale**:
+- MudBlazor doesn't natively support `backdrop-filter: blur()` — a small CSS overlay is needed
+- `MudTheme.LayoutProperties.DefaultBorderRadius` = `"12px"` applies rounded corners to all MudCard, MudPaper, MudDialog, etc. globally
+- CSS for glassmorphism is minimal (~15 lines) and scoped to `.mud-drawer` and overlay surfaces
+- Box-shadow hierarchy uses MudBlazor's existing `Elevation` parameter (e.g., `Elevation="2"` → subtle, `Elevation="4"` → prominent)
+
+**Implementation Notes**:
+- `wwwroot/css/app.css`:
+  ```css
+  .mud-drawer {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.7) !important;
+  }
+  .mud-theme-dark .mud-drawer {
+      background: rgba(30, 30, 30, 0.8) !important;
+  }
+  ```
+- `CustomTheme.cs`:
+  ```csharp
+  LayoutProperties = new LayoutProperties { DefaultBorderRadius = "12px" }
+  ```
+- 3 tonal surface levels (FR-030) via `PaletteLight.Surface`, `PaletteLight.Background`, `PaletteLight.DrawerBackground` (and Dark equivalents)
+
+**Alternatives Considered**:
+1. **Pure MudBlazor without glassmorphism**: Doesn't meet Constitution XI requirement for acrylic blur on overlay surfaces. Rejected.
+2. **Full custom CSS for all components**: Overrides MudBlazor's styling system, harder to maintain. Rejected — use MudTheme where possible, CSS only where necessary.
+3. **Blazor CSS isolation per component**: Would require per-component `.razor.css` files. Rejected — a single `app.css` is simpler for template-wide visual treatment.
+
+---
+
+## Decision 12: Animations & prefers-reduced-motion (Constitution XI, FR-026–FR-029)
+
+**Decision**: Implement hover transitions and page transitions via **CSS in `app.css`** with a `prefers-reduced-motion` media query override. Skeleton loading via MudBlazor's built-in `MudSkeleton` component.
+
+**Rationale**:
+- Hover transitions: CSS `transition: all 150ms ease-in-out` on `.mud-card`, `.mud-button-root`, and `.mud-nav-link` — minimal code, no JS
+- Page transitions: CSS `@keyframes fadeIn` applied to `MudMainContent` on route change via Blazor's `NavigationManager.LocationChanged` event + CSS class toggle
+- Skeleton loading: MudBlazor's `<MudSkeleton>` component handles shimmer animations natively — no custom code needed
+- `prefers-reduced-motion: reduce` media query wraps all transition/animation declarations — users who opt out see instant state changes
+
+**Implementation Notes**:
+- `wwwroot/css/app.css`:
+  ```css
+  .mud-card, .mud-button-root, .mud-nav-link {
+      transition: all 150ms ease-in-out;
+  }
+  @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+  .page-enter { animation: fadeIn 200ms ease-out; }
+  @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+      }
+  }
+  ```
+- `MainLayout.razor` applies `.page-enter` class to `MudMainContent` `@Body` wrapper on location change
+- `LoadingPlaceholder` uses `<MudSkeleton>` (shimmer built-in) — no additional CSS needed
+- MetricCard hover: MudCard `Elevation` change via `@onmouseenter`/`@onmouseleave` or pure CSS `:hover` elevation
+
+**Alternatives Considered**:
+1. **JS-based animations (GSAP, Animate.css)**: Additional dependency, larger bundle. Rejected — CSS is sufficient for subtle transitions.
+2. **Blazor `<TransitionGroup>`**: Not natively available in Blazor; would require custom implementation. Rejected for complexity.
+3. **No page transitions**: Meets minimum constitution requirements but loses polish. Rejected — simple CSS `fadeIn` adds significant UX improvement for ~5 lines of code.
 
 ---
 

@@ -1,10 +1,12 @@
 ﻿# blazor-practice Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-10
+Auto-generated from all feature plans. Last updated: 2026-04-16
 
 ## Active Technologies
 - .NET 8 (LTS) or .NET 9 (Current) + MudBlazor 7.x+ (UI components), Microsoft.AspNetCore.Components.WebAssembly
 - N/A (client-side only, no persistence)
+- .NET 9 (Current) or .NET 8 (LTS) + MudBlazor 7.x+ (UI components + theming) (001-base-template)
+- N/A (client-side only, no persistence except localStorage for dark mode preference) (001-base-template)
 
 ## Project Structure (4-Project Clean Architecture — Constitution v1.3.0)
 
@@ -38,6 +40,7 @@ dotnet publish src/BlazorBaseTemplate.Web -c Release   # Publish
 - Cost Optimization: delta-updates only, /speckit.checklist → /speckit.analyze before /speckit.implement
 
 ## Recent Changes
+- 001-base-template: Added .NET 9 (Current) or .NET 8 (LTS) + MudBlazor 7.x+ (UI components + theming)
 - 001-base-template: Updated to Constitution v1.3.0 (4-project structure, AdditionalAssemblies, launchSettings.json, C# best practices, cost optimization)
 
 <!-- MANUAL ADDITIONS START -->

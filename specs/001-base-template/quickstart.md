@@ -1,7 +1,7 @@
 # Quick Start Guide: Blazor Base Template
 
 **Feature**: 001-base-template  
-**Last Updated**: 2026-04-08  
+**Last Updated**: 2026-04-16 (Constitution v1.4.0 — dark mode, glassmorphism, visual design)  
 **Estimated Setup Time**: 5 minutes
 
 ---
@@ -65,10 +65,11 @@ info: Microsoft.Hosting.Lifetime[0]
 **Open browser**: Navigate to `https://localhost:5001`
 
 **You should see**:
-- ✅ Dashboard page with 4 metric cards
-- ✅ Responsive sidebar with navigation
-- ✅ Material Design UI (MudBlazor)
-- ✅ Working navigation between pages
+- ✅ Dashboard page with 4 metric cards (rounded corners, hover effects)
+- ✅ Responsive sidebar with glassmorphism blur effect
+- ✅ Material Design UI (MudBlazor) with Inter font
+- ✅ Dark mode toggle in the top app bar
+- ✅ Working navigation between pages with fade transition
 
 ---
 
@@ -124,21 +125,60 @@ BlazorBaseTemplate.sln                    # Solution file at root
 
 ### 🎨 Branding & Theming
 
-**File**: `src/BlazorBaseTemplate.Web/App.razor`
+**File**: `src/BlazorBaseTemplate.Web/Themes/CustomTheme.cs`
 
-Replace the default theme with your company colors:
+Customize the dual-palette theme (both light and dark modes):
 
 ```csharp
-@code {
-    private MudTheme _customTheme = new()
+public static MudTheme AppTheme = new()
+{
+    PaletteLight = new PaletteLight
     {
-        Palette = new PaletteLight
+        Primary = "#1E88E5",        // Your brand primary color
+        Secondary = "#26A69A",
+        AppbarBackground = "#1E88E5",
+        Surface = "#FFFFFF",
+        Background = "#F5F5F5",
+        DrawerBackground = "rgba(255, 255, 255, 0.7)", // Glassmorphism base
+    },
+    PaletteDark = new PaletteDark
+    {
+        Primary = "#42A5F5",        // Lighter variant for dark mode
+        Secondary = "#4DB6AC",
+        AppbarBackground = "#1E1E1E",
+        Surface = "#1E1E1E",
+        Background = "#121212",
+        DrawerBackground = "rgba(30, 30, 30, 0.8)",   // Glassmorphism base
+    },
+    Typography = new Typography
+    {
+        Default = new Default
         {
-            Primary = "#1E88E5",      // Your brand color
-            Secondary = "#26A69A",
-            AppbarBackground = "#1E88E5",
+            FontFamily = new[] { "Inter", "Geist", "Segoe UI", "system-ui", "-apple-system", "sans-serif" }
         }
-    };
+    },
+    LayoutProperties = new LayoutProperties
+    {
+        DefaultBorderRadius = "12px"   // Rounded corners for all surfaces
+    }
+};
+```
+
+**Dark mode** is toggled via the sun/moon icon in the top app bar. User preference is persisted in localStorage.
+
+**File**: `src/BlazorBaseTemplate.Web/wwwroot/css/app.css`
+
+Customize glassmorphism and animation values:
+
+```css
+/* Adjust blur intensity */
+.mud-drawer {
+    backdrop-filter: blur(12px);  /* Increase/decrease for more/less blur */
+}
+
+/* Adjust hover transition speed */
+.mud-card, .mud-button-root {
+    transition: all 150ms ease-in-out;  /* Change duration or easing */
 }
 ```
 
@@ -502,6 +542,14 @@ dotnet watch --project src/BlazorBaseTemplate.Web
 ```csharp
 Services.AddMudServices();
 ```
+
+### Issue: Dark mode toggle doesn't persist
+
+**Solution**: Ensure JS interop for localStorage is loaded. Check that `wwwroot/js/theme.js` (or inline script in `index.html`) exposes `themeInterop.getDarkMode()` and `themeInterop.setDarkMode()`.
+
+### Issue: Glassmorphism blur not visible
+
+**Solution**: `backdrop-filter` requires browser support (Chrome 76+, Firefox 103+, Safari 9+, Edge 79+). Ensure `wwwroot/css/app.css` includes both `-webkit-backdrop-filter` and `backdrop-filter` properties. On unsupported browsers, sidebar falls back to solid semi-transparent background.
 
 ---
 
