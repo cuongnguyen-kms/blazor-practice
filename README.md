@@ -46,7 +46,7 @@ Follow these steps in order. Each step invokes an AI agent that generates artifa
 Define project-wide architectural principles that AI must follow when generating code. This is the foundation — it enforces Clean Architecture, TDD, UI framework choice, and coding standards.
 
 ```
-@speckit.constitution
+/speckit.constitution
 ```
 
 **Output**: `.specify/memory/constitution.md`
@@ -58,7 +58,7 @@ Define project-wide architectural principles that AI must follow when generating
 Describe what you want in plain English. AI generates a structured spec with user stories, acceptance criteria, and requirements.
 
 ```
-@speckit.specify Build a Web Blazor App with a responsive sidebar, dashboard home page, and data-fetching page.
+/speckit.specify Build a Web Blazor App with a responsive sidebar, dashboard home page, and data-fetching page.
 ```
 
 **Output**: `specs/<feature-id>/spec.md`
@@ -70,7 +70,7 @@ Describe what you want in plain English. AI generates a structured spec with use
 AI identifies gaps in the spec and asks up to 5 targeted questions. Answers are encoded back into the spec automatically.
 
 ```
-@speckit.clarify
+/speckit.clarify
 ```
 
 #### Step 4. Generate the Implementation Plan
@@ -78,7 +78,7 @@ AI identifies gaps in the spec and asks up to 5 targeted questions. Answers are 
 AI creates a technical design — architecture decisions, component contracts, data models, and a quick start guide.
 
 ```
-@speckit.plan
+/speckit.plan
 ```
 
 **Output**: `plan.md`, `data-model.md`, `research.md`, `quickstart.md`, `contracts/component-contracts.md`
@@ -88,7 +88,7 @@ AI creates a technical design — architecture decisions, component contracts, d
 AI breaks the plan into dependency-ordered, actionable tasks with TDD flow (tests first, then implementation).
 
 ```
-@speckit.tasks
+/speckit.tasks
 ```
 
 **Output**: `specs/<feature-id>/tasks.md`
@@ -98,8 +98,8 @@ AI breaks the plan into dependency-ordered, actionable tasks with TDD flow (test
 Run pre-implementation checks to catch inconsistencies before generating code:
 
 ```
-@speckit.checklist    # Generate a custom checklist for the feature
-@speckit.analyze      # Cross-artifact consistency and quality analysis
+/speckit.checklist    # Generate a custom checklist for the feature
+/speckit.analyze      # Cross-artifact consistency and quality analysis
 ```
 
 Fix any issues surfaced, then proceed.
@@ -109,10 +109,10 @@ Fix any issues surfaced, then proceed.
 AI executes the task list — generating production code and tests in order, respecting dependencies and TDD flow.
 
 ```
-@speckit.implement
+/speckit.implement
 ```
 
-> **Re-generation**: To regenerate with changes, edit the spec or plan artifacts, then re-run `@speckit.tasks` → `@speckit.implement`. AI will produce updated code based on your modifications.
+> **Re-generation**: To regenerate with changes, edit the spec or plan artifacts, then re-run `/speckit.tasks` → `/speckit.implement`. AI will produce updated code based on your modifications.
 
 ### AI Source/Materials (Artifact Map)
 
