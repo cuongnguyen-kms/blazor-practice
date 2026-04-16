@@ -12,65 +12,14 @@ Use AI to generate a Web Blazor project with **minimum manual effort**. This rep
 1. **How to set up and develop a project using AI** — from constitution setup to spec-driven implementation, all orchestrated through AI agents
 2. **How to use AI to generate the code base** — and how to modify the specs/plans to re-generate with customization for your own needs
 
-## Features
+## What AI Generates
 
-- **Responsive Sidebar Navigation** — MudDrawer with glassmorphism blur, mobile collapse/expand, active route highlighting
-- **Dark/Light Mode Toggle** — Runtime theme switching with localStorage persistence and OS preference detection
-- **Dashboard Page** — 4 metric summary cards (Total Users, Active Projects, Completion Rate, Revenue) with hover transitions and responsive grid layout
-- **Data Fetching Example** — Async data loading with skeleton placeholders, error handling, empty state, and MudTable display
-- **Visual Design System** — Inter font, 12px rounded corners, 150ms hover transitions, page fade animations, `prefers-reduced-motion` compliance, WCAG 2.1 AA contrast
-- **Clean Architecture** — 4 production projects + 4 mirrored test projects with enforced dependency rules
-- **bUnit Tests** — Component and unit tests following TDD (Red-Green-Refactor)
+From the single input description, SpecKit agents produce a **Blazor WebAssembly** app (.NET 9, MudBlazor 9.x) following **4-project Clean Architecture** with bUnit tests — including a responsive sidebar, dashboard page, and data-fetching example. Full details are in the generated artifacts:
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | .NET 9 / Blazor WebAssembly |
-| UI Components | MudBlazor 9.x |
-| Testing | bUnit 2.x, xUnit, Moq |
-| Architecture | 4-Project Clean Architecture |
-| Spec Tooling | SpecKit 0.5.0 (GitHub Copilot integration) |
-
-## Project Structure
-
-```
-BlazorBaseTemplate.sln
-
-src/
-├── BlazorBaseTemplate.Domain/            # Entities, records (zero dependencies)
-│   └── Entities/                         # SampleDataItem, DashboardMetric, TrendDirection, MetricColor
-├── BlazorBaseTemplate.Application/       # Services, interfaces (→ Domain)
-│   ├── Interfaces/                       # ISampleDataService
-│   └── Services/                         # SampleDataService
-├── BlazorBaseTemplate.Infrastructure/    # External concerns, DI config (→ Application, Domain)
-│   └── Configuration/                    # ServiceCollectionExtensions
-└── BlazorBaseTemplate.Web/               # Blazor WASM presentation (→ all layers)
-    ├── Features/
-    │   ├── Dashboard/                    # Dashboard page, MetricCard, WelcomeSection
-    │   ├── DataExample/                  # DataExample page, DataTable, LoadingPlaceholder
-    │   └── Shared/                       # MainLayout, NavMenu, AppLogo, ThemeToggle
-    ├── Themes/                           # CustomTheme.cs (Light + Dark palettes)
-    └── wwwroot/                          # Static assets, CSS, index.html
-
-tests/
-├── BlazorBaseTemplate.Domain.Tests/
-├── BlazorBaseTemplate.Application.Tests/
-├── BlazorBaseTemplate.Infrastructure.Tests/
-└── BlazorBaseTemplate.Web.Tests/
-    ├── ComponentTests/                   # bUnit tests per feature
-    └── TestUtilities/                    # Shared test context helpers
-```
-
-### Dependency Rules
-
-```
-Domain          → No dependencies
-Application     → Domain only
-Infrastructure  → Application + Domain
-Web             → All layers
-Tests           → Mirror the layer they test
-```
+- **Architecture & structure** → [`plan.md`](specs/001-base-template/plan.md)
+- **Features & requirements** → [`spec.md`](specs/001-base-template/spec.md)
+- **Technical decisions** → [`research.md`](specs/001-base-template/research.md)
+- **Component APIs** → [`component-contracts.md`](specs/001-base-template/contracts/component-contracts.md)
 
 ## Practice Steps — Using AI to Generate the Project
 
