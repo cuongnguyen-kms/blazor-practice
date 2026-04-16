@@ -2,7 +2,8 @@
 
 **Feature**: 001-base-template  
 **Phase**: Phase 1 - Design  
-**Date**: 2026-04-08
+**Date**: 2026-04-08  
+**Last Updated**: 2026-04-16 (Constitution v1.4.0 — added theme state note)
 
 ## Purpose
 
@@ -137,6 +138,7 @@ public record DashboardMetric
 **Approach**: Minimal state management for template simplicity
 
 - **Component-level state**: Each page manages its own state via `@code` block or code-behind
+- **Theme state (dark mode)**: `_isDarkMode` boolean managed in `MainLayout.razor`, toggled by `ThemeToggle.razor` component. Persisted to browser `localStorage` via JS interop. On initial load, reads `localStorage` → falls back to OS `prefers-color-scheme` → defaults to light mode. This is UI-layer state only; no domain entity is needed.
 - **No global state**: Template doesn't demonstrate Flux/Redux patterns (developers add if needed)
 - **Service lifetime**: Data services registered as `Scoped` for component lifecycle management
 

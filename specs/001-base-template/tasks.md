@@ -1,10 +1,11 @@
 # Tasks: Blazor Base Template
 
 **Input**: Design documents from `/specs/001-base-template/`
-**Prerequisites**: plan.md (Constitution v1.3.0), spec.md, research.md, data-model.md, contracts/component-contracts.md, quickstart.md
+**Prerequisites**: plan.md (Constitution v1.4.0), spec.md, research.md, data-model.md, contracts/component-contracts.md, quickstart.md
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
-**Structure**: 4-project Clean Architecture per Constitution v1.3.0 (Domain, Application, Infrastructure, Web) + 4 mirrored test projects.
+**Structure**: 4-project Clean Architecture per Constitution v1.4.0 (Domain, Application, Infrastructure, Web) + 4 mirrored test projects.
+**Visual Design**: Constitution v1.4.0 adds Principle XI (Visual Design System) — tasks T076+ cover dark mode, glassmorphism, typography, animations, and accessibility.
 
 ---
 
@@ -51,7 +52,7 @@
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
 - [x] T021 Register MudBlazor services in src/BlazorBaseTemplate.Web/Program.cs (`builder.Services.AddMudServices()`)
-- [x] T022 [P] Create src/BlazorBaseTemplate.Web/App.razor with Router, AdditionalAssemblies, MudThemeProvider, MudDialogProvider, MudSnackbarProvider (Constitution VIII)
+- [x] T022 [P] Create src/BlazorBaseTemplate.Web/App.razor with Router and AdditionalAssemblies (Constitution VIII); MudThemeProvider, MudDialogProvider, MudSnackbarProvider are placed in MainLayout (see T086)
 - [x] T023 [P] Create src/BlazorBaseTemplate.Web/_Imports.razor with global using directives (@using MudBlazor, @using BlazorBaseTemplate.Domain.Entities, etc.)
 - [x] T024 [P] Create custom MudBlazor theme in src/BlazorBaseTemplate.Web/Themes/CustomTheme.cs
 - [x] T025 [P] Create src/BlazorBaseTemplate.Web/wwwroot/index.html entry point for Blazor WASM
@@ -66,11 +67,29 @@
 
 ---
 
+## Phase 2b: Visual Design System Foundation (Constitution v1.4.0)
+
+**Purpose**: Establish theming, typography, glassmorphism CSS, and animation infrastructure required by Principle XI. MUST be complete before US1 implementation since MainLayout depends on these.
+
+- [ ] T076 Update custom MudTheme in src/BlazorBaseTemplate.Web/Themes/CustomTheme.cs with dual PaletteLight and PaletteDark palettes, 3 tonal surface levels per palette (Surface, Background, DrawerBackground), WCAG AA compliant colors, Inter font family, and DefaultBorderRadius of 12px (FR-021, FR-022, FR-023, FR-024, FR-030)
+- [ ] T077 [P] Add Inter font CDN link to src/BlazorBaseTemplate.Web/wwwroot/index.html `<head>` section with preconnect hints for Google Fonts (FR-023)
+- [ ] T078 [P] Create glassmorphism CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `.mud-drawer` with `backdrop-filter: blur(12px)` and semi-transparent backgrounds for both light and dark modes (FR-025)
+- [ ] T079 [P] Add hover transition CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `transition: all 150ms ease-in-out` on `.mud-card`, `.mud-button-root`, `.mud-nav-link` (FR-026)
+- [ ] T080 [P] Add page transition CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `@keyframes fadeIn` animation and `.page-enter` class for route changes (FR-027)
+- [ ] T081 [P] Add `prefers-reduced-motion: reduce` media query in src/BlazorBaseTemplate.Web/wwwroot/css/app.css to disable all animation-duration and transition-duration for accessibility (FR-029)
+- [ ] T082 [P] Create JS interop for dark mode persistence — add `themeInterop` object to src/BlazorBaseTemplate.Web/wwwroot/index.html or src/BlazorBaseTemplate.Web/wwwroot/js/theme.js with getDarkMode(), setDarkMode(), and getSystemPreference() functions using localStorage and matchMedia (FR-020)
+- [ ] T083 Create ThemeToggle.razor component in src/BlazorBaseTemplate.Web/Features/Shared/Components/ThemeToggle.razor with IsDarkMode parameter, sun/moon icon toggle, IsDarkModeChanged callback, and aria-label (FR-020) (depends on T084 — test first per Constitution III)
+- [ ] T084 [P] Create bUnit test for ThemeToggle in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/ThemeToggleTests.cs (test icon switches, callback invoked, aria-label present)
+
+**Checkpoint**: Visual design infrastructure ready — MainLayout can now use ThemeToggle, glassmorphism drawer, and page transitions
+
+---
+
 ## Phase 3: User Story 1 — Core Layout and Navigation (Priority: P1) 🎯 MVP
 
-**Goal**: Provide responsive sidebar navigation with MudDrawer that works across all pages
+**Goal**: Provide responsive sidebar navigation with MudDrawer, glassmorphism blur, dark mode toggle, and page transitions across all pages
 
-**Independent Test**: Run application via `dotnet run --project src/BlazorBaseTemplate.Web`, verify sidebar appears, navigate between routes, resize browser to test mobile collapse/expand
+**Independent Test**: Run application via `dotnet run --project src/BlazorBaseTemplate.Web`, verify sidebar appears with acrylic blur, navigate between routes, toggle dark mode, resize browser to test mobile collapse/expand, verify page fade transition
 
 ### bUnit Tests for User Story 1
 
@@ -79,17 +98,21 @@
 - [x] T032 [P] [US1] Create bUnit test for MainLayout in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/MainLayoutTests.cs (test drawer toggle, responsive behavior)
 - [x] T033 [P] [US1] Create bUnit test for NavMenu in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/NavMenuTests.cs (test navigation links render, active state)
 - [x] T033b [P] [US1] Create bUnit test for AppLogo in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/AppLogoTests.cs (test renders correctly)
+- [ ] T085 [P] [US1] Update MainLayout bUnit tests in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/MainLayoutTests.cs to verify ThemeToggle renders in AppBar, dark mode toggles MudThemeProvider IsDarkMode, and page-enter CSS class applied to content wrapper
 
 ### Implementation for User Story 1
 
 - [x] T034 [P] [US1] Create MainLayout.razor in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor with MudLayout, MudAppBar, MudDrawer structure
 - [x] T035 [US1] Implement MainLayout.razor.cs code-behind with drawer toggle logic and responsive breakpoint handling in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor.cs
+- [ ] T086 [US1] Update MainLayout.razor in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor to integrate MudThemeProvider with @bind-IsDarkMode, ThemeToggle component in MudAppBar, glassmorphism-drawer CSS class on MudDrawer, and page-enter class on MudMainContent body wrapper (FR-020, FR-025, FR-027)
+- [ ] T087 [US1] Add JS interop calls to MainLayout.razor.cs for dark mode persistence — read localStorage/OS preference on OnAfterRenderAsync, write on toggle (FR-020)
 - [x] T036 [P] [US1] Create NavMenu.razor in src/BlazorBaseTemplate.Web/Features/Shared/NavMenu.razor with MudNavMenu and MudNavLink for "/" (Dashboard)
 - [x] T037 [P] [US1] Create AppLogo.razor component in src/BlazorBaseTemplate.Web/Features/Shared/Components/AppLogo.razor
 - [x] T038 [US1] Configure MainLayout as default layout in src/BlazorBaseTemplate.Web/App.razor Router DefaultLayout parameter
 - [x] T039 [US1] Verify all US1 bUnit tests pass (TDD Green phase) and refactor for clarity
+- [ ] T088 [US1] Verify all US1 visual design tests pass — ThemeToggle toggles dark mode, glassmorphism visible on drawer, page transition fade animates, prefers-reduced-motion disables animations
 
-**Checkpoint**: User Story 1 fully functional — responsive layout with working sidebar navigation
+**Checkpoint**: User Story 1 fully functional — responsive layout with glassmorphism sidebar, dark mode toggle, and page transitions
 
 ---
 
@@ -110,10 +133,12 @@
 - [x] T042 [P] [US2] Create bUnit test for MetricCard in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/MetricCardTests.cs (test parameter binding, trend display, null icon handling, MetricColor→MudBlazor.Color mapping)
 - [x] T043 [P] [US2] Create bUnit test for Dashboard page in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/DashboardTests.cs (test 4 metric cards render, responsive grid)
 - [x] T043b [P] [US2] Create bUnit test for WelcomeSection in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/WelcomeSectionTests.cs (test welcome message renders)
+- [ ] T089 [P] [US2] Add bUnit test case for MetricCard hover elevation change in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/MetricCardTests.cs (verify CSS transition class applied, elevation changes on hover via MudCard Elevation parameter) (FR-026)
 
 ### Implementation for User Story 2
 
 - [x] T044 [P] [US2] Create MetricCard.razor component in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/MetricCard.razor with MudCard, icon, title, value, trend indicator (map MetricColor → MudBlazor.Color for rendering)
+- [ ] T090 [US2] Add hover elevation change to MetricCard.razor in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/MetricCard.razor — use @onmouseenter/@onmouseleave to increase Elevation on hover or rely on CSS transition from app.css (FR-026)
 - [x] T045 [P] [US2] Create WelcomeSection.razor component in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/WelcomeSection.razor
 - [x] T046 [US2] Create Dashboard.razor page in src/BlazorBaseTemplate.Web/Features/Dashboard/Dashboard.razor with @page "/" and responsive MudGrid (xs=12, sm=6, md=4, lg=3)
 - [x] T047 [US2] Create Dashboard.razor.cs code-behind with sample DashboardMetric data (4 metrics: Total Users, Active Projects, Completion Rate, Revenue)
@@ -127,7 +152,7 @@
 
 **Goal**: Demonstrate async data fetching with loading states, error handling, and service injection patterns
 
-**Independent Test**: Navigate to "/data" route, verify loading spinner appears, then data table displays with sample records
+**Independent Test**: Navigate to "/data" route, verify skeleton/shimmer placeholder appears, then data table displays with sample records
 
 ### Domain & Application for User Story 3
 
@@ -146,6 +171,7 @@
 ### Implementation for User Story 3
 
 - [x] T056 [P] [US3] Create LoadingPlaceholder.razor component in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingPlaceholder.razor with MudProgressCircular
+- [ ] T091 [US3] Update LoadingPlaceholder.razor in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingPlaceholder.razor to use MudSkeleton shimmer by default instead of plain spinner, supporting Spinner/Skeleton/Linear types per contract (FR-028); create LoadingType enum in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingType.cs
 - [x] T057 [P] [US3] Create DataTable.razor component in src/BlazorBaseTemplate.Web/Features/DataExample/Components/DataTable.razor with MudTable<SampleDataItem> columns
 - [x] T058 [US3] Implement loading state (MudSkeleton) and empty state message in DataTable.razor
 - [x] T059 [US3] Create DataExample.razor page in src/BlazorBaseTemplate.Web/Features/DataExample/DataExample.razor with @page "/data"
@@ -159,7 +185,7 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-**Purpose**: Final improvements affecting multiple user stories and template completeness
+**Purpose**: Final improvements affecting multiple user stories, visual design validation, and template completeness
 
 - [x] T063 [P] Update README.md with comprehensive setup instructions, 4-project architecture diagram, dependency rules, and customization guide
 - [x] T064 [P] Create CHANGELOG.md documenting template version 1.0.0
@@ -174,6 +200,14 @@
 - [x] T073 [P] Test accessibility with browser dev tools (WCAG 2.1 AA via MudBlazor built-in support)
 - [x] T074 Test on multiple browsers: Chrome, Firefox, Safari, Edge
 - [x] T075 Final code review: verify all files ≤200 lines, record types for entities, file-scoped namespaces, _camelCase fields (Constitution IX + X)
+- [ ] T092 [P] Validate WCAG AA contrast ratios for all PaletteLight and PaletteDark color pairings using browser dev tools or contrast checker (FR-022)
+- [ ] T093 [P] Validate dark mode persistence: toggle dark mode, refresh browser, confirm preference restored from localStorage (FR-020)
+- [ ] T094 [P] Validate glassmorphism: verify MudDrawer shows backdrop-filter blur effect in both light and dark modes (FR-025)
+- [ ] T095 [P] Validate prefers-reduced-motion: enable "Reduce motion" in OS settings, verify all animations and transitions are disabled (FR-029)
+- [ ] T096 [P] Validate Inter font: verify Inter loads from Google Fonts CDN and renders as primary font-family in browser inspector (FR-023)
+- [ ] T097 [P] Validate skeleton loading: navigate to "/data", verify MudSkeleton shimmer effect appears during data load (FR-028)
+- [ ] T098 Update README.md to document dark mode toggle, theming customization (CustomTheme.cs), and visual design system overview
+- [ ] T099 Run quickstart.md validation — verify all expected outputs from quickstart.md match actual app behavior including glassmorphism, dark mode, page transitions
 
 ---
 
@@ -182,19 +216,20 @@
 ### Phase Dependencies
 
 ```text
-Phase 1 (Setup)        → No dependencies — start immediately
-Phase 2 (Foundational) → Depends on Phase 1 completion — BLOCKS all user stories
-Phase 3 (US1 - P1)     → Depends on Phase 2 — provides layout for all pages
-Phase 4 (US2 - P2)     → Depends on Phase 2 + US1 layout (T034-T038)
-Phase 5 (US3 - P3)     → Depends on Phase 2 + US1 layout (T034-T038)
-Phase 6 (Polish)        → Depends on all user stories complete
+Phase 1 (Setup)            → No dependencies — start immediately
+Phase 2 (Foundational)     → Depends on Phase 1 completion — BLOCKS all user stories
+Phase 2b (Visual Design)   → Depends on Phase 2 — BLOCKS US1 (MainLayout needs theme + CSS)
+Phase 3 (US1 - P1)         → Depends on Phase 2b — provides layout for all pages
+Phase 4 (US2 - P2)         → Depends on Phase 2b + US1 layout (T034-T038, T086-T087)
+Phase 5 (US3 - P3)         → Depends on Phase 2b + US1 layout (T034-T038, T086-T087)
+Phase 6 (Polish)            → Depends on all user stories complete
 ```
 
 ### User Story Dependencies
 
-- **US1 (Layout)**: Can start immediately after Phase 2 — foundation for all pages
-- **US2 (Dashboard)**: Can start after Phase 2, integrates with US1 MainLayout
-- **US3 (Data Example)**: Can start after Phase 2, integrates with US1 NavMenu
+- **US1 (Layout)**: Can start immediately after Phase 2b — foundation for all pages
+- **US2 (Dashboard)**: Can start after Phase 2b, integrates with US1 MainLayout
+- **US3 (Data Example)**: Can start after Phase 2b, integrates with US1 NavMenu
 
 ### Within Each User Story (TDD Flow)
 
@@ -209,10 +244,11 @@ Phase 6 (Polish)        → Depends on all user stories complete
 
 **Phase 1**: T002, T004, T005 (after T003); T009-T012 parallel; T014-T020 parallel
 **Phase 2**: T022-T030 parallel (after T021)
-**Phase 3 (US1)**: T032+T033 parallel; T034+T036+T037 parallel
-**Phase 4 (US2)**: T040+T041 parallel; T042+T043 parallel; T044+T045 parallel
+**Phase 2b**: T077-T084 all parallel (after T076 for theme); T078-T082 independent of each other
+**Phase 3 (US1)**: T032+T033+T085 parallel; T034+T036+T037 parallel
+**Phase 4 (US2)**: T040+T041 parallel; T042+T043+T089 parallel; T044+T045 parallel
 **Phase 5 (US3)**: T049+T050 parallel; T053+T054+T055 parallel; T056+T057 parallel
-**Phase 6**: T063-T067+T071-T073 parallel
+**Phase 6**: T063-T067+T071-T073+T092-T097 parallel
 
 ---
 
@@ -222,17 +258,18 @@ Phase 6 (Polish)        → Depends on all user stories complete
 
 1. Complete Phase 1: Setup (T001-T020)
 2. Complete Phase 2: Foundational (T021-T031) — CRITICAL
-3. Complete Phase 3: User Story 1 (T032-T039)
-4. **STOP and VALIDATE**: Run app, test responsive layout independently
-5. Deploy/demo if ready
+3. Complete Phase 2b: Visual Design System Foundation (T076-T084) — CRITICAL for v1.4.0
+4. Complete Phase 3: User Story 1 (T032-T039, T085-T088)
+5. **STOP and VALIDATE**: Run app, test responsive layout, dark mode toggle, glassmorphism sidebar independently
+6. Deploy/demo if ready
 
 ### Incremental Delivery
 
-1. Setup + Foundational → Foundation ready (8 projects compile)
-2. Add User Story 1 → Test independently → MVP with navigation
-3. Add User Story 2 → Test independently → MVP + Dashboard
-4. Add User Story 3 → Test independently → Complete template
-5. Add Polish → Final release
+1. Setup + Foundational + Visual Design → Foundation ready (8 projects compile, theme + CSS in place)
+2. Add User Story 1 → Test independently → MVP with navigation, dark mode, glassmorphism
+3. Add User Story 2 → Test independently → MVP + Dashboard with hover transitions
+4. Add User Story 3 → Test independently → Complete template with skeleton loading
+5. Add Polish → Validate visual design system, accessibility, cross-browser → Final release
 
 ### Cost Optimization Reminder (Constitution X)
 

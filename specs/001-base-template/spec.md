@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-base-template`  
 **Created**: 2026-04-08  
-**Last Updated**: 2026-04-10 (Constitution v1.3.0 alignment: MudBlazor, 4-project architecture, gap fixes)  
+**Last Updated**: 2026-04-16 (Constitution v1.4.0 alignment: dark mode, glassmorphism, visual design system)  
 **Status**: Draft  
 **Input**: User description: "Build a Web Blazor App. It should serve as a base template for company projects. Minimal manual effort required. Include a responsive sidebar, a dashboard home page, and a sample data-fetching page."
 
@@ -24,6 +24,9 @@ A developer clones the template repository and immediately has a working Blazor 
 4. **Given** the sidebar is collapsed, **When** the user clicks the hamburger menu, **Then** the sidebar slides out and displays navigation links
 5. **Given** the sidebar contains multiple navigation links, **When** the user clicks a link, **Then** the route changes and the corresponding page is displayed
 6. **Given** the user navigates to different pages, **When** they view the layout, **Then** the sidebar remains consistent across all routes
+7. **Given** the application is running, **When** the user views the sidebar, **Then** it displays with an acrylic/frosted-glass blur effect and consistent inner padding
+8. **Given** the application is running, **When** the user clicks a dark mode toggle in the top bar, **Then** the entire application switches between light and dark themes instantly
+9. **Given** the user navigates between routes, **When** the page transition occurs, **Then** a subtle fade or slide-in animation is visible
 
 ---
 
@@ -41,6 +44,8 @@ A developer has access to a functional dashboard home page that serves as the ap
 2. **Given** the dashboard page is displayed, **When** the user views the page, **Then** they see 4 summary cards showing example metrics (Total Users, Active Projects, Completion Rate, Revenue)
 3. **Given** the dashboard uses a responsive grid, **When** the viewport is resized, **Then** the cards reflow appropriately (4 columns desktop → 2 columns tablet → 1 column mobile)
 4. **Given** the dashboard has visual hierarchy, **When** the user views the page, **Then** the layout uses consistent spacing, typography, and MudBlazor theming
+5. **Given** a summary card is displayed, **When** the user hovers over it, **Then** a subtle visual transition occurs (e.g., elevation change or shadow shift)
+6. **Given** the dashboard is viewed in dark mode, **When** the user views the page, **Then** all cards, text, and backgrounds use the dark palette with correct contrast
 
 ---
 
@@ -71,6 +76,8 @@ A developer can see a working example of how to fetch and display data in Blazor
 - How does the sidebar behave when there are many navigation items? MudDrawer content area should scroll vertically if items exceed viewport height.
 - What happens when JavaScript is disabled? Application should show a message that Blazor requires JavaScript (standard Blazor behavior).
 - What happens when the data service returns an empty list? The page MUST display an empty-state message (FR-019).
+- What happens when the user has `prefers-reduced-motion: reduce` enabled in their OS? All animations and transitions MUST be disabled or minimized to respect the user's accessibility preference.
+- What happens when the user toggles dark mode? All surfaces, text, and component colors MUST switch to the dark palette immediately without a page reload. The preference SHOULD persist across sessions (via localStorage or similar).
 
 ## Requirements *(mandatory)*
 
@@ -95,6 +102,17 @@ A developer can see a working example of how to fetch and display data in Blazor
 - **FR-017**: Application MUST demonstrate WebAssembly-specific download size optimization via publish trimming
 - **FR-018**: Data fetching example page MUST display a MudAlert with Severity.Error containing either the exception message or a generic fallback ("Failed to load data. Please try again.") when the data service throws an exception
 - **FR-019**: Data fetching example page MUST display a MudAlert with Severity.Info containing an empty-state message ("No data records found.") when no data records are returned
+- **FR-020**: Application MUST include a dark mode toggle (e.g., icon button in the top app bar) that switches between light and dark themes at runtime without a page reload
+- **FR-021**: Application MUST define a custom MudTheme with both Light (Palette) and Dark (PaletteDark) color palettes, configured via MudThemeProvider
+- **FR-022**: All primary, secondary, and accent colors in both palettes MUST meet WCAG 2.1 AA contrast ratios (≥ 4.5:1 for normal text, ≥ 3:1 for large text)
+- **FR-023**: Application MUST use a modern sans-serif font stack: Inter (primary), with Geist, Segoe UI, system-ui, -apple-system, sans-serif as fallbacks; font MUST be loaded via CDN link or @font-face in wwwroot/css/
+- **FR-024**: All cards, dialogs, buttons, and container surfaces MUST use rounded corners (border-radius: 12px or equivalent MudBlazor theme override)
+- **FR-025**: Sidebar navigation MUST include an acrylic/glassmorphism blur effect (`backdrop-filter: blur(12px)`) with semi-transparent backgrounds (`rgba(255,255,255,0.7)` light / `rgba(30,30,30,0.8)` dark) for both light and dark modes
+- **FR-026**: All interactive elements (buttons, cards, links) MUST include subtle hover transitions (transition duration ~150ms ease-in-out)
+- **FR-027**: Page/route transitions MUST include a fade animation (200–300ms ease-in) when navigating between pages
+- **FR-028**: Loading states MUST use skeleton placeholders (MudSkeleton shimmer) instead of plain spinners for DataTable and LoadingPlaceholder components; LoadingPlaceholder additionally supports Spinner and Linear modes for flexibility
+- **FR-029**: All animations and transitions MUST respect `prefers-reduced-motion: reduce` by disabling motion for users who opt out
+- **FR-030**: The MudTheme MUST define at least 3 tonal surface levels (Surface, Background, DrawerBackground) for visual depth hierarchy in both light and dark palettes
 
 ### Key Entities *(include if feature involves data)*
 
@@ -103,20 +121,25 @@ A developer can see a working example of how to fetch and display data in Blazor
 
 ### UI Components *(include if feature involves Blazor components)*
 
-- **MainLayout**: Top-level layout component containing the sidebar (MudDrawer) and main content area (MudMainContent)
+- **MainLayout**: Top-level layout component containing MudThemeProvider, MudAppBar, sidebar (MudDrawer), and main content area (MudMainContent)
   - **Input Parameters**: None (layout component)
   - **Events/Callbacks**: None
-  - **Testing Focus**: Component renders correctly, drawer toggle works, responsive breakpoints function properly
+  - **Testing Focus**: Component renders correctly, drawer toggle works, responsive breakpoints function properly, MudThemeProvider switches between light/dark palettes
 
-- **NavMenu**: Navigation menu component rendered inside MudDrawer with collapsible behavior
+- **ThemeToggle**: Dark/light mode toggle button rendered in the MudAppBar
+  - **Input Parameters**: IsDarkMode (bool, two-way bindable — current dark mode state)
+  - **Events/Callbacks**: IsDarkModeChanged (EventCallback\<bool\> — invoked with new value on toggle)
+  - **Testing Focus**: Toggle switches theme correctly, icon changes between sun/moon, IsDarkModeChanged callback fires, aria-label present, preference persists across page reloads
+
+- **NavMenu**: Navigation menu component rendered inside MudDrawer with collapsible behavior and acrylic/glassmorphism blur background
   - **Input Parameters**: None (uses MudNavMenu with MudNavLink children)
   - **Events/Callbacks**: Drawer toggle via MudIconButton in MudAppBar
-  - **Testing Focus**: Navigation links render, active state highlighting, mobile vs desktop behavior
+  - **Testing Focus**: Navigation links render, active state highlighting, mobile vs desktop behavior, blur effect applied
 
-- **MetricCard**: Reusable card component for dashboard metrics using MudCard
-  - **Input Parameters**: Metric (DashboardMetric record — title, value, icon, trend, color)
-  - **Events/Callbacks**: None
-  - **Testing Focus**: Rendering with different parameter combinations, trend indicator display, null icon handling
+- **MetricCard**: Reusable card component for dashboard metrics using MudCard with rounded corners (12px) and subtle hover transition
+  - **Input Parameters**: Metric (DashboardMetric record), Elevation (int, default 2), Class (string, optional CSS)
+  - **Events/Callbacks**: OnClick (EventCallback — optional card click for drilldown)
+  - **Testing Focus**: Rendering with different parameter combinations, trend indicator display, null icon handling, hover elevation change, OnClick invocation
 
 - **WelcomeSection**: Header section component for the dashboard page
   - **Input Parameters**: None (static welcome content)
@@ -129,14 +152,14 @@ A developer can see a working example of how to fetch and display data in Blazor
   - **Testing Focus**: Renders correctly
 
 - **DataTable**: Component for displaying tabular data using MudTable
-  - **Input Parameters**: Items (IEnumerable<SampleDataItem>), IsLoading (bool)
-  - **Events/Callbacks**: None
-  - **Testing Focus**: Loading state display (MudSkeleton), empty state handling, data rendering with columns
+  - **Input Parameters**: Items (IEnumerable<SampleDataItem>), IsLoading (bool), HidePagination (bool, default false)
+  - **Events/Callbacks**: OnRowClick (EventCallback\<SampleDataItem\> — invoked when a row is clicked)
+  - **Testing Focus**: Loading state display (MudSkeleton), empty state handling, data rendering with columns, row click callback, pagination toggle
 
-- **LoadingPlaceholder**: Loading indicator component using MudProgressCircular
-  - **Input Parameters**: None (standard loading display)
+- **LoadingPlaceholder**: Loading indicator component supporting skeleton shimmer, spinner, and linear progress modes
+  - **Input Parameters**: Message (string, default "Loading..."), Type (LoadingType enum: Spinner/Skeleton/Linear, default Skeleton), Height (int, default 100)
   - **Events/Callbacks**: None
-  - **Testing Focus**: Renders correctly with progress indicator
+  - **Testing Focus**: Renders correct MudBlazor component per Type parameter, displays message, respects prefers-reduced-motion
 
 ## Success Criteria *(mandatory)*
 
@@ -152,6 +175,10 @@ A developer can see a working example of how to fetch and display data in Blazor
 - **SC-008**: All UI components are reusable (can be used on multiple pages without modification)
 - **SC-009**: Documentation completeness: README includes setup steps, architecture diagram, and extension guidelines
 - **SC-010**: Initial application download size is under 2MB (compressed) for fast first load on typical connections
+- **SC-011**: Dark mode toggle switches the entire UI between light and dark palettes instantly (under 100ms perceived delay) with no page reload
+- **SC-012**: All text in both light and dark modes meets WCAG 2.1 AA contrast ratios (≥ 4.5:1 for normal text, ≥ 3:1 for large text)
+- **SC-013**: Hover transitions on interactive elements complete in ~150ms with a smooth ease-in-out curve
+- **SC-014**: Users with `prefers-reduced-motion: reduce` enabled see no animations or transitions beyond essential state changes
 
 ## Assumptions
 
@@ -167,6 +194,8 @@ A developer can see a working example of how to fetch and display data in Blazor
 - Sample data is hard-coded or randomly generated client-side (no database or server dependency)
 - Developers will host the compiled WebAssembly application on static hosting (Azure Static Web Apps, Netlify, GitHub Pages, or similar) — MudBlazor WASM output is compatible with all static hosts
 - Developers will customize branding, colors, and content after cloning the template
+- The Inter font will be loaded via Google Fonts CDN; if CDN is unavailable, the font stack falls back to Geist, Segoe UI, then system sans-serif
+- Dark mode user preference will be persisted in browser localStorage; initial load defaults to the OS-level prefers-color-scheme if no saved preference exists
 - Template targets modern browsers with WebAssembly and CSS Grid support (Chrome 79+, Firefox 78+, Safari 13+, Edge 79+) as required by MudBlazor
 - Accessibility features follow WCAG 2.1 AA guidelines leveraging MudBlazor's built-in accessibility support (ARIA attributes, keyboard navigation, sufficient color contrast)
 - Template includes minimal example content; developers will replace with actual business logic

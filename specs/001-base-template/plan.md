@@ -1,162 +1,105 @@
 # Implementation Plan: Blazor Base Template
 
-**Branch**: `001-base-template` | **Date**: 2026-04-08 | **Spec**: [spec.md](spec.md)
+**Branch**: `001-base-template` | **Date**: 2026-04-16 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification from `/specs/001-base-template/spec.md`
 
-**Note**: This plan documents the implementation approach for the Blazor Base Template, updated for Constitution v1.3.0 (4-project Clean Architecture, Router AdditionalAssemblies, launchSettings.json, C# best practices, cost optimization workflow).
+**Note**: Updated for Constitution v1.4.0 alignment (dark mode, glassmorphism, visual design system).
 
 ## Summary
 
-Create a production-ready Blazor WebAssembly template with responsive navigation, dashboard page, and data-fetching example. The template enforces a mandatory 4-project Clean Architecture structure (`BlazorBaseTemplate.Domain`, `.Application`, `.Infrastructure`, `.Web`) with compile-time dependency rules, organized within a Visual Studio Solution (.sln). Key deliverables: MudBlazor-based responsive sidebar, sample dashboard with metric cards, async data service demonstration, comprehensive bUnit test coverage across 4 mirrored test projects, F5-ready launchSettings.json, and Router with `AdditionalAssemblies` configured.
+Build a Blazor WebAssembly base template with a responsive sidebar (with acrylic glassmorphism blur), a dashboard home page with metric cards, a data-fetching example page, and full dark/light mode theming. Uses MudBlazor 7.x+ as the UI framework with a custom `MudTheme` (dual Light/Dark palettes), Inter font stack, 12px rounded corners, skeleton loading placeholders, subtle hover/page transitions, and `prefers-reduced-motion` compliance. 4-project Clean Architecture (Domain, Application, Infrastructure, Web) with bUnit tests.
 
 ## Technical Context
 
-**Language/Version**: .NET 8 (LTS) or .NET 9 (Current)  
-**Framework**: Blazor WebAssembly (InteractiveWebAssembly render mode)  
-**Primary Dependencies**: MudBlazor 7.x+ (UI components), Microsoft.AspNetCore.Components.WebAssembly  
-**UI/Styling**: MudBlazor 7.x+ component library (Material Design) with custom theming  
-**Storage**: N/A (client-side only, no persistence required for base template)  
-**Testing**: bUnit 1.26+ (component testing), xUnit (test runner), Moq (mocking services)  
-**Target Platform**: Modern web browsers with WebAssembly and CSS Grid support (Chrome 79+, Firefox 78+, Safari 13+, Edge 79+) as required by MudBlazor  
-**Render Mode**: InteractiveWebAssembly (full client-side execution, WASM downloaded on first visit)  
-**Performance Goals**: <2s initial page load, <100ms component render, <2MB compressed WASM bundle download  
-**Constraints**: 80%+ bUnit test coverage (NON-NEGOTIABLE per Constitution III), responsive design (mobile-first), feature-based component organization, ≤200 lines/file (Constitution X)  
-**Scale/Scope**: 4 production projects + 4 test projects, ~15 source files, ~10 test files; scales to 50+ components, 20+ pages
+**Language/Version**: .NET 9 (Current) or .NET 8 (LTS)
+**Framework**: Blazor WebAssembly (standalone, client-side)
+**Primary Dependencies**: MudBlazor 7.x+ (UI components + theming)
+**UI/Styling**: MudBlazor with custom `MudTheme` (Constitution IV); supplemental CSS for glassmorphism, transitions, and font loading
+**Storage**: N/A (client-side only, no persistence except localStorage for dark mode preference)
+**Testing**: bUnit 1.26+ (component testing), xUnit (test runner), Moq (mocking)
+**Target Platform**: Web browsers — Chrome 79+, Firefox 78+, Safari 13+, Edge 79+
+**Render Mode**: Blazor WebAssembly (InteractiveWebAssembly, client-side only)
+**Performance Goals**: <2MB compressed download, <100ms page navigation, 60fps animations, <100ms dark mode toggle
+**Constraints**: 80%+ test coverage, WCAG 2.1 AA contrast (≥4.5:1 normal text, ≥3:1 large text), prefers-reduced-motion compliance
+**Scale/Scope**: Base template — 2 pages, ~8 components, 4 production projects, 4 test projects
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-| # | Principle | Status | Notes |
-|---|-----------|--------|-------|
-| I | Clean Architecture First (NON-NEGOTIABLE) | ✅ Pass | 4 separate .csproj projects: `.Domain`, `.Application`, `.Infrastructure`, `.Web` with enforced `<ProjectReference>` boundaries |
-| II | Component-Driven Development | ✅ Pass | All UI via reusable MudBlazor components with Parameters/EventCallbacks |
-| III | Test-First with bUnit (NON-NEGOTIABLE) | ✅ Pass | 4 test projects mirroring production layers; 80%+ coverage target |
-| IV | Tailwind-First Styling | ⚠️ Justified | Using MudBlazor instead of Tailwind — see Complexity Tracking below |
-| V | Dependency Injection & Services Pattern | ✅ Pass | ISampleDataService interface + SampleDataService impl registered in Program.cs |
-| VI | .NET Modern Standards | ✅ Pass | Nullable refs, records, file-scoped namespaces, async/await, CancellationToken |
-| VII | Solution-Based Project Structure (NON-NEGOTIABLE) | ✅ Pass | .sln at root, 4 src/ projects, 4 tests/ projects, launchSettings.json in .Web |
-| VIII | Blazor Router Configuration (NON-NEGOTIABLE) | ✅ Pass | App.razor Router includes `AdditionalAssemblies` parameter |
-| IX | C# Coding Best Practices | ✅ Pass | Records for entities, `_camelCase` fields, `Async` suffixes, `nameof()`, ≤200-line files |
-| X | Cost Optimization | ✅ Pass | ≤200-line files, delta-update tasks, dry-run workflow mandated before implementation |
+- **I. Clean Architecture First**: ✅ 4-project structure planned — Domain (entities), Application (services, interfaces), Infrastructure (DI config), Web (Blazor WASM presentation)
+- **II. Component-Driven Development**: ✅ 8 reusable components defined in spec (MainLayout, ThemeToggle, NavMenu, MetricCard, WelcomeSection, AppLogo, DataTable, LoadingPlaceholder)
+- **III. Test-First with bUnit (NON-NEGOTIABLE)**: ✅ bUnit test examples for MetricCard, DataTable, MainLayout planned; 80% coverage target; 4 mirrored test projects
+- **IV. UI Framework & Styling**: ✅ MudBlazor 7.x+ chosen; custom MudTheme with Light + Dark palettes; dark mode togglable at runtime (FR-020, FR-021); no inline styles; design tokens centralized in MudTheme
+- **V. Dependency Injection & Services Pattern**: ✅ ISampleDataService interface + SampleDataService implementation; Scoped lifetime; registered in Program.cs
+- **VI. .NET Modern Standards**: ✅ Nullable reference types enabled; record types for DTOs/entities; async/await for data service; file-scoped namespaces; CancellationToken support
+- **VII. Solution-Based Project Structure**: ✅ BlazorBaseTemplate.sln at root; src/ (4 projects) + tests/ (4 projects); launchSettings.json in Web project
+- **VIII. Blazor Router Configuration**: ✅ App.razor with AdditionalAssemblies configured
+- **IX. C# Coding Best Practices**: ✅ PascalCase, _camelCase fields, file-scoped namespaces, record types, ≤200-line files
+- **X. AI Cost Optimization**: ✅ Delta-update approach; ≤200-line files; dry-run pipeline (checklist → analyze → implement)
+- **XI. Visual Design System**: ✅ Glassmorphism/Clean SaaS aesthetic planned — acrylic blur sidebar (FR-025), Inter font stack (FR-023), 12px rounded corners (FR-024), 150ms hover transitions (FR-026), page transitions (FR-027), skeleton loading (FR-028), prefers-reduced-motion (FR-029), 3 tonal surface levels (FR-030), WCAG AA colors (FR-022)
 
-**Constitution Reference**: `.specify/memory/constitution.md` v1.3.0
+**Constitution Reference**: `.specify/memory/constitution.md` v1.4.0
+
+**GATE RESULT**: ✅ ALL PRINCIPLES PASS — proceeding to Phase 0.
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+specs/001-base-template/
+├── plan.md              # This file
+├── research.md          # Phase 0 output
+├── data-model.md        # Phase 1 output
+├── quickstart.md        # Phase 1 output
+├── contracts/           # Phase 1 output
+│   └── component-contracts.md
+├── checklists/
+│   ├── requirements.md
+│   └── consistency.md
+└── tasks.md             # Phase 2 output (/speckit.tasks command)
 ```
 
 ### Source Code (repository root)
 
 ```text
-# 4-Project Clean Architecture Solution (Constitution I + VII)
-BlazorBaseTemplate.sln                    # Visual Studio Solution file at root
+BlazorBaseTemplate.sln
 
 src/
-├── BlazorBaseTemplate.Domain/            # Class Library — zero dependencies
-│   ├── Entities/
-│   │   ├── DashboardMetric.cs            # record type (Constitution IX)
-│   │   ├── MetricColor.cs                # enum (maps to MudBlazor.Color in Web)
-│   │   ├── SampleDataItem.cs             # record type (Constitution IX)
-│   │   └── TrendDirection.cs             # enum
-│   └── BlazorBaseTemplate.Domain.csproj
-│
-├── BlazorBaseTemplate.Application/       # Class Library → references Domain only
-│   ├── Interfaces/
-│   │   └── ISampleDataService.cs
-│   ├── Services/
-│   │   └── SampleDataService.cs
-│   └── BlazorBaseTemplate.Application.csproj
-│
-├── BlazorBaseTemplate.Infrastructure/    # Class Library → references Application + Domain
-│   ├── Configuration/
-│   │   └── ServiceCollectionExtensions.cs
-│   └── BlazorBaseTemplate.Infrastructure.csproj
-│
-└── BlazorBaseTemplate.Web/               # Blazor WASM → references all layers
-    ├── Features/                          # Feature-based organization
-    │   ├── Shared/                        # MainLayout, NavMenu, AppLogo
-    │   │   └── Components/
-    │   ├── Dashboard/                     # Dashboard page, MetricCard, WelcomeSection
-    │   │   └── Components/
-    │   └── DataExample/                   # DataExample page, DataTable, LoadingPlaceholder
-    │       └── Components/
-    ├── Themes/
-    │   └── CustomTheme.cs                 # MudBlazor custom theme
+├── BlazorBaseTemplate.Domain/
+│   └── Entities/                     # SampleDataItem, DashboardMetric, TrendDirection, MetricColor
+├── BlazorBaseTemplate.Application/
+│   ├── Interfaces/                   # ISampleDataService
+│   └── Services/                     # SampleDataService
+├── BlazorBaseTemplate.Infrastructure/
+│   └── Configuration/                # DI extension methods
+└── BlazorBaseTemplate.Web/
+    ├── Features/
+    │   ├── Shared/                   # MainLayout, NavMenu, AppLogo, ThemeToggle
+    │   ├── Dashboard/                # Dashboard page, MetricCard, WelcomeSection
+    │   └── DataExample/              # DataExample page, DataTable, LoadingPlaceholder
+    ├── Themes/                       # CustomTheme.cs (MudTheme with Light+Dark palettes)
     ├── wwwroot/
     │   ├── css/
-    │   ├── index.html
-    │   └── appsettings.json
-    ├── App.razor                          # Router with AdditionalAssemblies (Constitution VIII)
-    ├── Program.cs                         # Entry point and DI configuration
-    ├── _Imports.razor                     # Global using directives
-    ├── Properties/
-    │   └── launchSettings.json            # F5-ready profiles (Constitution VII)
-    └── BlazorBaseTemplate.Web.csproj
+    │   │   └── app.css               # Glassmorphism, transitions, Inter font, prefers-reduced-motion
+    │   └── index.html                # Inter font CDN link
+    ├── App.razor                     # Router + AdditionalAssemblies
+    ├── Program.cs                    # DI registration, MudServices
+    └── Properties/
+        └── launchSettings.json
 
 tests/
-├── BlazorBaseTemplate.Domain.Tests/       # Mirrors Domain layer
-│   ├── Entities/
-│   └── BlazorBaseTemplate.Domain.Tests.csproj
-│
-├── BlazorBaseTemplate.Application.Tests/  # Mirrors Application layer
-│   ├── Services/
-│   │   └── SampleDataServiceTests.cs
-│   └── BlazorBaseTemplate.Application.Tests.csproj
-│
-├── BlazorBaseTemplate.Infrastructure.Tests/ # Mirrors Infrastructure layer
-│   └── BlazorBaseTemplate.Infrastructure.Tests.csproj
-│
-└── BlazorBaseTemplate.Web.Tests/          # Mirrors Web layer (bUnit)
-    ├── ComponentTests/
-    │   ├── Shared/                        # MainLayoutTests, NavMenuTests
-    │   ├── Dashboard/                     # DashboardTests, MetricCardTests
-    │   └── DataExample/                   # DataTableTests, LoadingPlaceholderTests
-    ├── TestUtilities/
-    │   └── TestContextBase.cs
-    └── BlazorBaseTemplate.Web.Tests.csproj
-
-.editorconfig                              # Code style enforcement
-.gitignore                                 # Git ignore rules
-README.md                                  # Setup instructions and architecture docs
-CHANGELOG.md                               # Version history
+├── BlazorBaseTemplate.Domain.Tests/
+├── BlazorBaseTemplate.Application.Tests/
+├── BlazorBaseTemplate.Infrastructure.Tests/
+└── BlazorBaseTemplate.Web.Tests/
+    ├── ComponentTests/               # bUnit tests: MetricCardTests, DataTableTests, MainLayoutTests, ThemeToggleTests
+    └── TestUtilities/
 ```
 
-**Structure Decision**: Mandatory 4-project Clean Architecture per Constitution v1.3.0. The `.Web` project replaces the previous single-project `.Presentation` approach. Dependency boundaries are enforced at the .csproj reference level — Domain has zero `<ProjectReference>` entries, Application references only Domain, Infrastructure references Application and Domain, Web references all three. Single-project "folder organization" is explicitly prohibited by Constitution I.
-
-### .csproj Dependency Matrix
-
-```text
-BlazorBaseTemplate.Domain.csproj         → (none)
-BlazorBaseTemplate.Application.csproj    → Domain
-BlazorBaseTemplate.Infrastructure.csproj → Application, Domain
-BlazorBaseTemplate.Web.csproj            → Infrastructure, Application, Domain + MudBlazor 7.x+
-```
+**Structure Decision**: Feature-based folder structure within the Web project (Features/Dashboard, Features/DataExample, Features/Shared) as decided in research.md. MudBlazor chosen over Tailwind CSS per research Decision 1.
 
 ## Complexity Tracking
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| MudBlazor instead of Tailwind CSS (Constitution IV) | MudBlazor provides 60+ production-ready accessible components, reducing template dev time by 40-60 hours | Tailwind requires building drawer, sidebar, cards, tables, and accessibility from scratch — contradicts "minimal effort" spec requirement |
-
-**All 10 Constitution principles (I-X) are now satisfied** by this design:
-- Clean Architecture enforced via 4 separate .csproj projects with compile-time dependency rules
-- Component-driven development with reusable MudBlazor components
-- Test-first with bUnit across 4 mirrored test projects (80%+ coverage target)
-- MudBlazor component library for UI consistency (justified Tailwind deviation)
-- Dependency injection pattern for all services
-- Modern .NET standards (nullable types, records, async/await, CancellationToken, file-scoped namespaces)
-- Solution-based structure with .sln file at root, 4 src/ + 4 tests/ projects, launchSettings.json
-- Router configured with AdditionalAssemblies in App.razor
-- C# coding best practices enforced (naming, organization, null safety, ≤200-line files)
-- Cost optimization: delta-update tasks, dry-run workflow mandated before implementation
+> No constitution violations. All principles satisfied.

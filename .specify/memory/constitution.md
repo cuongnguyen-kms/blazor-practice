@@ -1,20 +1,18 @@
 <!--
 Sync Impact Report:
-Version: 1.2.0 → 1.3.0 (Added C# best practices and cost optimization principles)
-Modified Principles: None
+Version: 1.3.0 → 1.4.0 (Modern UI/UX standards: broadened styling framework + visual design system)
+Modified Principles:
+  - Principle IV: "Tailwind-First Styling" → "UI Framework & Styling" (broadened to allow MudBlazor)
 Added Sections:
-  - Principle IX: C# Coding Best Practices
-  - Principle X: AI-Assisted Development Cost Optimization
+  - Principle XI: Visual Design System (glassmorphism, typography, animations, component patterns)
 Removed Sections: None
 Templates Requiring Updates:
+  ✅ plan-template.md - Updated Constitution Check to reference Principle IV (UI Framework) and Principle XI (Visual Design)
   ✅ spec-template.md - No changes needed (technology-agnostic)
-  ✅ plan-template.md - No changes needed
-  ⚠️ tasks-template.md - Should reference cost optimization workflow (checklist → analyze → implement)
-  ⚠️ quickstart.md - Should document the dry-run workflow
+  ✅ tasks-template.md - No changes needed (references styling generically)
 Follow-up TODOs:
-  - Update tasks-template.md to embed cost optimization workflow reminders
-  - Update quickstart.md to document checklist → analyze → implement pipeline
-  - Ensure all existing code complies with C# best practices principle
+  - Ensure existing Tailwind configurations are compatible with new MudBlazor option
+  - Review .github/copilot-instructions.md to align with constitution v1.4.0
 -->
 
 # Blazor Web App Constitution
@@ -82,19 +80,44 @@ Test-Driven Development is MANDATORY for all Blazor components:
 **Rationale**: TDD ensures components are designed for testability from the start, 
 catches regressions early, and serves as living documentation.
 
-### IV. Tailwind-First Styling
+### IV. UI Framework & Styling
 
-All styling MUST use Tailwind CSS utility classes:
+All styling MUST use one of the approved UI frameworks consistently across the project:
+
+**Approved Frameworks** (choose one per project):
+- **Tailwind CSS 3.x+** — Utility-first CSS with `tailwind.config.js` customization
+- **MudBlazor 7.x+** — Component library with built-in theming system
+
+**Framework-Specific Rules**:
+
+*If Tailwind CSS*:
 - Prefer utility classes over custom CSS
-- Use `@layer components` for component-level reusable styles only when utilities 
-  become unwieldy
-- No inline `<style>` blocks in .razor files
-- Maintain design system consistency via tailwind.config.js customization
-- Use Tailwind's responsive prefixes (sm:, md:, lg:, xl:, 2xl:) for responsive design
-- Dark mode support via Tailwind's dark: variant when required
+- Use `@layer components` for component-level reusable styles only when
+  utilities become unwieldy
+- Use responsive prefixes (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`) for
+  responsive design
+- Use `dark:` variant for dark mode support
 
-**Rationale**: Utility-first CSS reduces CSS bloat, ensures design consistency, 
-speeds development, and makes styling changes predictable.
+*If MudBlazor*:
+- Define a custom `MudTheme` with both Light and Dark palettes
+- Use MudBlazor component parameters for styling (Color, Variant, Size)
+  instead of raw CSS
+- Extend the theme via `MudThemeProvider` in `MainLayout.razor`
+- Use `MudBlazor.Utilities.MudColor` for programmatic color manipulation
+
+**Common Rules** (both frameworks):
+- No inline `<style>` blocks in `.razor` files
+- Dark mode MUST be supported and togglable at runtime
+- Design tokens (colors, spacing, radii, shadows) MUST be defined centrally
+  (Tailwind config or MudBlazor `MudTheme`)
+- All custom CSS, if any, MUST reside in dedicated `.css` files under
+  `wwwroot/css/`
+
+**Rationale**: Standardizing on an approved framework prevents ad-hoc styling,
+ensures design consistency, and enables dark mode and theming across the
+entire application. Allowing MudBlazor as an alternative to Tailwind
+acknowledges Blazor-native component libraries that provide accessible,
+pre-built components with integrated theming.
 
 ### V. Dependency Injection & Services Pattern
 
@@ -301,10 +324,72 @@ All AI-assisted code generation MUST follow cost-conscious practices to minimize
 - This pipeline prevents wasted token spend on failed code due to specification or plan inconsistencies
 - If `/speckit.analyze` reports critical issues, implementation MUST be blocked until resolved
 
-**Rationale**: AI-assisted development consumes tokens proportional to context size and output length. 
-By keeping files small, generating only deltas, and validating before implementation, we minimize 
-wasted token spend, reduce generation errors, and achieve faster iteration cycles. The dry-run workflow 
-ensures we "measure twice, cut once" — catching errors in cheap validation rather than expensive code generation.
+**Rationale**: AI-assisted development consumes tokens proportional to context size and output length.
+By keeping files small, generating only deltas, and validating before implementation, we minimize
+wasted token spend, reduce generation errors, and achieve faster iteration cycles. The dry-run workflow
+ensures we "measure twice, cut once" — catching errors in cheap validation rather than expensive
+code generation.
+
+### XI. Visual Design System
+
+All user-facing pages and components MUST adhere to a cohesive visual
+design system to ensure a modern, professional appearance:
+
+**Visual Aesthetic — "Clean SaaS / Glassmorphism"**:
+- Generous whitespace between sections and components
+- Rounded corners: `border-radius: 12px` (or MudBlazor `Rounded="true"`
+  with custom theme radius) on cards, dialogs, buttons, and containers
+- Subtle box-shadows for depth hierarchy (e.g.,
+  `box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1)` or Tailwind `shadow-md`)
+- Glassmorphism effects (frosted-glass backgrounds with
+  `backdrop-filter: blur()` and semi-transparent backgrounds) MUST be used
+  on overlay surfaces: sidebar navigation, modal dialogs, dropdown menus
+
+**Typography**:
+- Primary font stack MUST use a modern sans-serif typeface:
+  `Inter`, `Geist`, or `Segoe UI` (in that preference order, with
+  `system-ui, -apple-system, sans-serif` as fallback)
+- Font MUST be loaded via `@font-face` in `wwwroot/css/` or a CDN link
+  in `index.html` / `App.razor`
+- Heading scale MUST follow a consistent typographic hierarchy
+  (e.g., modular scale ratio 1.25)
+- Body text: 14–16px; Line height: 1.5–1.75 for readability
+
+**Sidebar & Navigation**:
+- Applications MUST use a sidebar-based navigation layout
+- Sidebar MUST include an acrylic/blur effect background
+  (`backdrop-filter: blur(12px)` with `background: rgba(255,255,255,0.7)`
+  for light mode, `rgba(30,30,30,0.8)` for dark mode)
+- Consistent inner padding: `p-6` (1.5rem) or `p-8` (2rem)
+- Active route indicator MUST be visually distinct (highlight, border-left,
+  or background change)
+- Sidebar MUST be collapsible on smaller viewports
+
+**Animations & Transitions**:
+- Hover states on interactive elements (buttons, cards, links) MUST include
+  a subtle transition: `transition: all 150ms ease-in-out` (or Tailwind
+  `transition-all duration-150 ease-in-out`)
+- Page/route transitions MUST use a fade or slide-in animation
+  (CSS `@keyframes` or Blazor `<TransitionGroup>` / JS interop)
+- Loading states MUST use skeleton placeholders or shimmer animations
+  instead of plain spinners where feasible
+- Animations MUST respect `prefers-reduced-motion: reduce` — disable or
+  minimize motion for users who opt out
+
+**Color & Theming**:
+- A dual-palette (light + dark) MUST be defined upfront in the theme
+  configuration (Tailwind `darkMode: 'class'` or MudBlazor
+  `MudTheme.PaletteDark`)
+- Primary, secondary, and accent colors MUST meet WCAG 2.1 AA contrast
+  ratios (≥ 4.5:1 for normal text, ≥ 3:1 for large text)
+- Surface and background colors MUST have at least 3 tonal levels for
+  depth (e.g., surface, surface-variant, background)
+
+**Rationale**: A unified visual design system prevents inconsistent UI,
+reduces design debt, and delivers a polished, modern user experience.
+Glassmorphism and clean SaaS aesthetics align with current industry trends
+while remaining accessible and performant when combined with
+`prefers-reduced-motion` compliance.
 
 ## Technology Stack Requirements
 
@@ -312,9 +397,10 @@ ensures we "measure twice, cut once" — catching errors in cheap validation rat
 - .NET 8 or .NET 9 (latest LTS or current)
 - Blazor Web App (Auto, Server, or WebAssembly render modes as appropriate)
 
-**Styling & UI**:
-- Tailwind CSS 3.x for utility-first styling
-- Optional: Radix UI Blazor or Blazorise for pre-built accessible components
+**Styling & UI** (choose one per project — see Principle IV):
+- Tailwind CSS 3.x+ for utility-first styling, OR
+- MudBlazor 7.x+ for Blazor-native component library with theming
+- Dark mode MUST be supported (see Principle XI)
 
 **Testing**:
 - bUnit for Blazor component unit testing
@@ -355,11 +441,12 @@ ensures we "measure twice, cut once" — catching errors in cheap validation rat
 **Code Review Checklist**:
 - Architecture layers respected (no domain logic in components)
 - Components follow single-responsibility principle
-- Tailwind utilities used correctly
+- UI framework (Tailwind / MudBlazor) used per Principle IV
 - Dependency injection configured properly
 - Tests comprehensive and meaningful
 - Error handling and user feedback implemented
 - Responsive design verified
+- Visual design system compliance (Principle XI): typography, spacing, animations
 
 ## Governance
 
@@ -382,4 +469,4 @@ architectural and implementation decisions.
 - Constitution violations MUST be addressed before merge
 - Use `.specify/memory/constitution.md` as the authoritative source during development
 
-**Version**: 1.3.0 | **Ratified**: 2026-04-08 | **Last Amended**: 2026-04-10
+**Version**: 1.4.0 | **Ratified**: 2026-04-08 | **Last Amended**: 2026-04-16

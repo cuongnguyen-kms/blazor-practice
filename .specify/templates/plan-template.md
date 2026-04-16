@@ -20,7 +20,7 @@
 **Language/Version**: .NET 8 or .NET 9 (LTS or current)  
 **Framework**: Blazor Web App (Auto/Server/WebAssembly render mode)  
 **Primary Dependencies**: [e.g., MediatR, FluentValidation, AutoMapper or NEEDS CLARIFICATION]  
-**UI/Styling**: Tailwind CSS 3.x (utility-first), [e.g., Radix UI Blazor, Blazorise or custom components]  
+**UI/Styling**: Tailwind CSS 3.x OR MudBlazor 7.x+ (see Constitution IV), [e.g., custom MudTheme, Radix UI Blazor or custom components]  
 **Storage**: [if applicable, e.g., SQL Server, PostgreSQL, Entity Framework Core, files or N/A]  
 **Testing**: bUnit (component testing), xUnit/NUnit/MSTest (test runner), Moq/NSubstitute (mocking)  
 **Target Platform**: [e.g., Web browsers (Chrome, Firefox, Safari, Edge) or NEEDS CLARIFICATION]  
@@ -36,12 +36,13 @@
 - **I. Clean Architecture First**: Verify domain/application/infrastructure/presentation layer separation is planned
 - **II. Component-Driven Development**: Confirm all UI features are designed as reusable Blazor components
 - **III. Test-First with bUnit (NON-NEGOTIABLE)**: Ensure bUnit test plan exists for all components before implementation
-- **IV. Tailwind-First Styling**: Verify Tailwind utility classes will be used; no inline styles or CSS bloat
+- **IV. UI Framework & Styling**: Verify approved UI framework (Tailwind CSS or MudBlazor) is chosen; dark mode planned; no inline styles
 - **V. Dependency Injection & Services Pattern**: Confirm all business logic resides in services registered via DI
 - **VI. .NET Modern Standards**: Check nullable reference types enabled, async/await, modern C# features planned
 - **VII. Solution-Based Project Structure**: Verify .sln file at root, src/ and tests/ folders, all projects added to solution
+- **XI. Visual Design System**: Verify glassmorphism/clean SaaS aesthetic, modern typography (Inter/Geist/Segoe UI), sidebar with acrylic blur, and animation standards planned
 
-**Constitution Reference**: `.specify/memory/constitution.md` v1.1.0
+**Constitution Reference**: `.specify/memory/constitution.md` v1.4.0
 
 ## Project Structure
 

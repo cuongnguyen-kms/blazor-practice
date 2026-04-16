@@ -1,7 +1,8 @@
 # Component Contracts
 
 **Feature**: 001-base-template  
-**Purpose**: Define Blazor component interfaces (parameters, events, lifecycle) and service contracts
+**Purpose**: Define Blazor component interfaces (parameters, events, lifecycle) and service contracts  
+**Last Updated**: 2026-04-16 (Constitution v1.4.0 — ThemeToggle, glassmorphism, animations, skeleton loading)
 
 ---
 
@@ -62,6 +63,7 @@ Contracts ensure components remain testable, reusable, and loosely coupled.
 - Shows trend indicator only when TrendDirection is not null
 - Invokes OnClick when card is clicked
 - Applies custom CSS class if provided
+- Hover state increases elevation (subtle shadow transition, ~150ms ease-in-out)
 
 ---
 
@@ -176,9 +178,10 @@ public enum LoadingType
 
 **Testing Contract**:
 - Renders MudProgressCircular when Type = Spinner
-- Renders MudSkeleton when Type = Skeleton
+- Renders MudSkeleton (shimmer animation) when Type = Skeleton
 - Renders MudProgressLinear when Type = Linear
 - Displays provided message with spinner type
+- Skeleton shimmer respects prefers-reduced-motion (handled by MudBlazor internally)
 
 ---
 
@@ -202,27 +205,35 @@ public enum LoadingType
 
 **Rendering Contract**:
 ```html
-<MudThemeProvider Theme="@_customTheme" />
+<MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="@CustomTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar>
+    <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" OnClick="ToggleDrawer" />
-        <!-- App title/logo -->
+        <MudText Typo="Typo.h6">App Title</MudText>
+        <MudSpacer />
+        <ThemeToggle OnToggle="ToggleDarkMode" />
     </MudAppBar>
     
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always">
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always"
+              Class="glassmorphism-drawer">
         <NavMenu />
     </MudDrawer>
     
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4 page-enter">
             @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 ```
+
+**State**:
+- `_drawerOpen` (bool): Controls MudDrawer visibility
+- `_isDarkMode` (bool): Controls MudThemeProvider dark/light palette; persisted to localStorage via JS interop
+- `CustomTheme` (MudTheme): Custom theme with Light + Dark palettes, Inter font, 12px border-radius
 
 **Usage Example**:
 ```razor
@@ -233,10 +244,48 @@ public enum LoadingType
 
 **Testing Contract**:
 - Renders MudDrawer that can be toggled open/closed
-- Renders AppBar with menu button
-- Renders Body content in MudContainer
+- Renders AppBar with menu button and ThemeToggle
+- Renders Body content in MudContainer with page-enter fade animation
 - Drawer is closed by default
 - Clicking menu button toggles drawer open state
+- Drawer has glassmorphism blur effect (backdrop-filter: blur(12px))
+- Dark mode toggleable via ThemeToggle; persists to localStorage
+- MudThemeProvider switches between PaletteLight and PaletteDark
+
+---
+
+### ThemeToggle Component
+
+**Location**: `Presentation/Features/Shared/Components/ThemeToggle.razor`
+
+**Purpose**: Dark/light mode toggle button rendered in the MudAppBar
+
+**Parameters**:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `IsDarkMode` | `bool` | No | `false` | Current dark mode state (two-way bindable) |
+| `IsDarkModeChanged` | `EventCallback<bool>` | No | - | Callback when toggle is clicked |
+
+**Rendering Contract**:
+```html
+<MudIconButton Icon="@(_isDark ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+               Color="Color.Inherit"
+               OnClick="Toggle"
+               aria-label="Toggle dark mode" />
+```
+
+**Behavioral Contract**:
+- Clicking toggles between `Icons.Material.Filled.DarkMode` (sun) and `Icons.Material.Filled.LightMode` (moon) icons
+- Invokes `IsDarkModeChanged` callback with new boolean value
+- Parent (MainLayout) persists preference to localStorage via JS interop
+- Toggle applies immediately (<100ms perceived delay)
+
+**Testing Contract**:
+- Renders sun icon when IsDarkMode = false
+- Renders moon icon when IsDarkMode = true
+- Invokes IsDarkModeChanged with inverted value on click
+- Includes `aria-label` for accessibility
 
 ---
 
@@ -396,6 +445,74 @@ All pages must inherit from `MainLayout` to ensure MudBlazor theme providers are
 
 ---
 
+### Theme Contract (MudTheme)
+
+The custom `MudTheme` (defined in `Web/Themes/CustomTheme.cs`) MUST include:
+
+```csharp
+public static MudTheme AppTheme = new()
+{
+    PaletteLight = new PaletteLight { /* WCAG AA compliant colors */ },
+    PaletteDark = new PaletteDark { /* WCAG AA compliant colors */ },
+    Typography = new Typography
+    {
+        Default = new Default
+        {
+            FontFamily = new[] { "Inter", "Geist", "Segoe UI", "system-ui", "-apple-system", "sans-serif" }
+        }
+    },
+    LayoutProperties = new LayoutProperties
+    {
+        DefaultBorderRadius = "12px"
+    }
+};
+```
+
+**Contract Requirements**:
+- Both `PaletteLight` and `PaletteDark` MUST be defined
+- All text/background color pairings MUST meet WCAG 2.1 AA contrast (≥4.5:1)
+- `Surface`, `Background`, and `DrawerBackground` MUST provide 3 distinct tonal levels per palette
+- `DefaultBorderRadius` MUST be `"12px"` (Constitution XI)
+- Font family MUST start with `Inter` (Constitution XI)
+
+---
+
+### CSS Contract (wwwroot/css/app.css)
+
+The global stylesheet MUST include:
+
+1. **Glassmorphism** for `.mud-drawer`:
+   - `backdrop-filter: blur(12px)` with semi-transparent background
+   - Dark mode variant via `.mud-theme-dark .mud-drawer`
+
+2. **Hover transitions** for interactive elements:
+   - `transition: all 150ms ease-in-out` on `.mud-card`, `.mud-button-root`, `.mud-nav-link`
+
+3. **Page transition** animation:
+   - `@keyframes fadeIn` applied to `.page-enter` class
+
+4. **Reduced motion** override:
+   - `@media (prefers-reduced-motion: reduce)` block setting all `animation-duration` and `transition-duration` to `0.01ms`
+
+---
+
+### JS Interop Contract (Dark Mode Persistence)
+
+A JS module (`wwwroot/js/theme.js` or inline in `index.html`) MUST expose:
+
+```javascript
+// Read saved preference (returns "true", "false", or null)
+window.themeInterop = {
+    getDarkMode: () => localStorage.getItem("darkMode"),
+    setDarkMode: (isDark) => localStorage.setItem("darkMode", isDark),
+    getSystemPreference: () => window.matchMedia("(prefers-color-scheme: dark)").matches
+};
+```
+
+**Contract**: MainLayout calls these on initialization and on toggle.
+
+---
+
 ## Versioning and Breaking Changes
 
 **Contract Versioning Policy**:
@@ -416,7 +533,8 @@ All pages must inherit from `MainLayout` to ensure MudBlazor theme providers are
 - `MetricCard`: 4 parameters, 1 event
 - `DataTable`: 4 parameters, 1 event
 - `LoadingPlaceholder`: 3 parameters, 0 events
-- `MainLayout`: 1 parameter (Body), internal state
+- `MainLayout`: 1 parameter (Body), internal state (_drawerOpen, _isDarkMode)
+- `ThemeToggle`: 2 parameters (IsDarkMode, IsDarkModeChanged)
 - `NavMenu`: 0 parameters
 - `AppLogo`: 2 parameters
 
@@ -426,6 +544,9 @@ All pages must inherit from `MainLayout` to ensure MudBlazor theme providers are
 **Integration Points**:
 - DI registration in Program.cs
 - Routing via @page directives
-- Theme inheritance via MainLayout
+- Theme inheritance via MainLayout (MudThemeProvider)
+- Dark mode persistence via JS interop (localStorage)
+- Glassmorphism and transitions via wwwroot/css/app.css
+- Inter font via Google Fonts CDN in index.html
 
 All contracts designed for testability with bUnit and mockable services with Moq.
