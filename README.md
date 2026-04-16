@@ -1,4 +1,4 @@
-# AI Agent to Create a Web Blazor App
+# Let AI Write Your Boilerplate: Spec-Driven Code Generation in Practice
 
 Use AI to generate a Web Blazor project with **minimum manual effort**. This repository demonstrates how to leverage **GitHub Copilot** with **SpecKit agents** to go from a natural language description to a fully structured, tested Blazor WebAssembly codebase.
 
