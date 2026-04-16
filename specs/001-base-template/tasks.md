@@ -71,15 +71,15 @@
 
 **Purpose**: Establish theming, typography, glassmorphism CSS, and animation infrastructure required by Principle XI. MUST be complete before US1 implementation since MainLayout depends on these.
 
-- [ ] T076 Update custom MudTheme in src/BlazorBaseTemplate.Web/Themes/CustomTheme.cs with dual PaletteLight and PaletteDark palettes, 3 tonal surface levels per palette (Surface, Background, DrawerBackground), WCAG AA compliant colors, Inter font family, and DefaultBorderRadius of 12px (FR-021, FR-022, FR-023, FR-024, FR-030)
-- [ ] T077 [P] Add Inter font CDN link to src/BlazorBaseTemplate.Web/wwwroot/index.html `<head>` section with preconnect hints for Google Fonts (FR-023)
-- [ ] T078 [P] Create glassmorphism CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `.mud-drawer` with `backdrop-filter: blur(12px)` and semi-transparent backgrounds for both light and dark modes (FR-025)
-- [ ] T079 [P] Add hover transition CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `transition: all 150ms ease-in-out` on `.mud-card`, `.mud-button-root`, `.mud-nav-link` (FR-026)
-- [ ] T080 [P] Add page transition CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `@keyframes fadeIn` animation and `.page-enter` class for route changes (FR-027)
-- [ ] T081 [P] Add `prefers-reduced-motion: reduce` media query in src/BlazorBaseTemplate.Web/wwwroot/css/app.css to disable all animation-duration and transition-duration for accessibility (FR-029)
-- [ ] T082 [P] Create JS interop for dark mode persistence — add `themeInterop` object to src/BlazorBaseTemplate.Web/wwwroot/index.html or src/BlazorBaseTemplate.Web/wwwroot/js/theme.js with getDarkMode(), setDarkMode(), and getSystemPreference() functions using localStorage and matchMedia (FR-020)
-- [ ] T083 Create ThemeToggle.razor component in src/BlazorBaseTemplate.Web/Features/Shared/Components/ThemeToggle.razor with IsDarkMode parameter, sun/moon icon toggle, IsDarkModeChanged callback, and aria-label (FR-020) (depends on T084 — test first per Constitution III)
-- [ ] T084 [P] Create bUnit test for ThemeToggle in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/ThemeToggleTests.cs (test icon switches, callback invoked, aria-label present)
+- [x] T076 Update custom MudTheme in src/BlazorBaseTemplate.Web/Themes/CustomTheme.cs with dual PaletteLight and PaletteDark palettes, 3 tonal surface levels per palette (Surface, Background, DrawerBackground), WCAG AA compliant colors, Inter font family, and DefaultBorderRadius of 12px (FR-021, FR-022, FR-023, FR-024, FR-030)
+- [x] T077 [P] Add Inter font CDN link to src/BlazorBaseTemplate.Web/wwwroot/index.html `<head>` section with preconnect hints for Google Fonts (FR-023)
+- [x] T078 [P] Create glassmorphism CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `.mud-drawer` with `backdrop-filter: blur(12px)` and semi-transparent backgrounds for both light and dark modes (FR-025)
+- [x] T079 [P] Add hover transition CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `transition: all 150ms ease-in-out` on `.mud-card`, `.mud-button-root`, `.mud-nav-link` (FR-026)
+- [x] T080 [P] Add page transition CSS in src/BlazorBaseTemplate.Web/wwwroot/css/app.css — `@keyframes fadeIn` animation and `.page-enter` class for route changes (FR-027)
+- [x] T081 [P] Add `prefers-reduced-motion: reduce` media query in src/BlazorBaseTemplate.Web/wwwroot/css/app.css to disable all animation-duration and transition-duration for accessibility (FR-029)
+- [x] T082 [P] Create JS interop for dark mode persistence — add `themeInterop` object to src/BlazorBaseTemplate.Web/wwwroot/index.html or src/BlazorBaseTemplate.Web/wwwroot/js/theme.js with getDarkMode(), setDarkMode(), and getSystemPreference() functions using localStorage and matchMedia (FR-020)
+- [x] T083 Create ThemeToggle.razor component in src/BlazorBaseTemplate.Web/Features/Shared/Components/ThemeToggle.razor with IsDarkMode parameter, sun/moon icon toggle, IsDarkModeChanged callback, and aria-label (FR-020) (depends on T084 — test first per Constitution III)
+- [x] T084 [P] Create bUnit test for ThemeToggle in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/ThemeToggleTests.cs (test icon switches, callback invoked, aria-label present)
 
 **Checkpoint**: Visual design infrastructure ready — MainLayout can now use ThemeToggle, glassmorphism drawer, and page transitions
 
@@ -98,19 +98,19 @@
 - [x] T032 [P] [US1] Create bUnit test for MainLayout in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/MainLayoutTests.cs (test drawer toggle, responsive behavior)
 - [x] T033 [P] [US1] Create bUnit test for NavMenu in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/NavMenuTests.cs (test navigation links render, active state)
 - [x] T033b [P] [US1] Create bUnit test for AppLogo in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/AppLogoTests.cs (test renders correctly)
-- [ ] T085 [P] [US1] Update MainLayout bUnit tests in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/MainLayoutTests.cs to verify ThemeToggle renders in AppBar, dark mode toggles MudThemeProvider IsDarkMode, and page-enter CSS class applied to content wrapper
+- [x] T085 [P] [US1] Update MainLayout bUnit tests in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Shared/MainLayoutTests.cs to verify ThemeToggle renders in AppBar, dark mode toggles MudThemeProvider IsDarkMode, and page-enter CSS class applied to content wrapper
 
 ### Implementation for User Story 1
 
 - [x] T034 [P] [US1] Create MainLayout.razor in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor with MudLayout, MudAppBar, MudDrawer structure
 - [x] T035 [US1] Implement MainLayout.razor.cs code-behind with drawer toggle logic and responsive breakpoint handling in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor.cs
-- [ ] T086 [US1] Update MainLayout.razor in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor to integrate MudThemeProvider with @bind-IsDarkMode, ThemeToggle component in MudAppBar, glassmorphism-drawer CSS class on MudDrawer, and page-enter class on MudMainContent body wrapper (FR-020, FR-025, FR-027)
-- [ ] T087 [US1] Add JS interop calls to MainLayout.razor.cs for dark mode persistence — read localStorage/OS preference on OnAfterRenderAsync, write on toggle (FR-020)
+- [x] T086 [US1] Update MainLayout.razor in src/BlazorBaseTemplate.Web/Features/Shared/MainLayout.razor to integrate MudThemeProvider with @bind-IsDarkMode, ThemeToggle component in MudAppBar, glassmorphism-drawer CSS class on MudDrawer, and page-enter class on MudMainContent body wrapper (FR-020, FR-025, FR-027)
+- [x] T087 [US1] Add JS interop calls to MainLayout.razor.cs for dark mode persistence — read localStorage/OS preference on OnAfterRenderAsync, write on toggle (FR-020)
 - [x] T036 [P] [US1] Create NavMenu.razor in src/BlazorBaseTemplate.Web/Features/Shared/NavMenu.razor with MudNavMenu and MudNavLink for "/" (Dashboard)
 - [x] T037 [P] [US1] Create AppLogo.razor component in src/BlazorBaseTemplate.Web/Features/Shared/Components/AppLogo.razor
 - [x] T038 [US1] Configure MainLayout as default layout in src/BlazorBaseTemplate.Web/App.razor Router DefaultLayout parameter
 - [x] T039 [US1] Verify all US1 bUnit tests pass (TDD Green phase) and refactor for clarity
-- [ ] T088 [US1] Verify all US1 visual design tests pass — ThemeToggle toggles dark mode, glassmorphism visible on drawer, page transition fade animates, prefers-reduced-motion disables animations
+- [x] T088 [US1] Verify all US1 visual design tests pass — ThemeToggle toggles dark mode, glassmorphism visible on drawer, page transition fade animates, prefers-reduced-motion disables animations
 
 **Checkpoint**: User Story 1 fully functional — responsive layout with glassmorphism sidebar, dark mode toggle, and page transitions
 
@@ -133,12 +133,12 @@
 - [x] T042 [P] [US2] Create bUnit test for MetricCard in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/MetricCardTests.cs (test parameter binding, trend display, null icon handling, MetricColor→MudBlazor.Color mapping)
 - [x] T043 [P] [US2] Create bUnit test for Dashboard page in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/DashboardTests.cs (test 4 metric cards render, responsive grid)
 - [x] T043b [P] [US2] Create bUnit test for WelcomeSection in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/WelcomeSectionTests.cs (test welcome message renders)
-- [ ] T089 [P] [US2] Add bUnit test case for MetricCard hover elevation change in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/MetricCardTests.cs (verify CSS transition class applied, elevation changes on hover via MudCard Elevation parameter) (FR-026)
+- [x] T089 [P] [US2] Add bUnit test case for MetricCard hover elevation change in tests/BlazorBaseTemplate.Web.Tests/ComponentTests/Dashboard/MetricCardTests.cs (verify CSS transition class applied, elevation changes on hover via MudCard Elevation parameter) (FR-026)
 
 ### Implementation for User Story 2
 
 - [x] T044 [P] [US2] Create MetricCard.razor component in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/MetricCard.razor with MudCard, icon, title, value, trend indicator (map MetricColor → MudBlazor.Color for rendering)
-- [ ] T090 [US2] Add hover elevation change to MetricCard.razor in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/MetricCard.razor — use @onmouseenter/@onmouseleave to increase Elevation on hover or rely on CSS transition from app.css (FR-026)
+- [x] T090 [US2] Add hover elevation change to MetricCard.razor in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/MetricCard.razor — use @onmouseenter/@onmouseleave to increase Elevation on hover or rely on CSS transition from app.css (FR-026)
 - [x] T045 [P] [US2] Create WelcomeSection.razor component in src/BlazorBaseTemplate.Web/Features/Dashboard/Components/WelcomeSection.razor
 - [x] T046 [US2] Create Dashboard.razor page in src/BlazorBaseTemplate.Web/Features/Dashboard/Dashboard.razor with @page "/" and responsive MudGrid (xs=12, sm=6, md=4, lg=3)
 - [x] T047 [US2] Create Dashboard.razor.cs code-behind with sample DashboardMetric data (4 metrics: Total Users, Active Projects, Completion Rate, Revenue)
@@ -171,7 +171,7 @@
 ### Implementation for User Story 3
 
 - [x] T056 [P] [US3] Create LoadingPlaceholder.razor component in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingPlaceholder.razor with MudProgressCircular
-- [ ] T091 [US3] Update LoadingPlaceholder.razor in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingPlaceholder.razor to use MudSkeleton shimmer by default instead of plain spinner, supporting Spinner/Skeleton/Linear types per contract (FR-028); create LoadingType enum in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingType.cs
+- [x] T091 [US3] Update LoadingPlaceholder.razor in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingPlaceholder.razor to use MudSkeleton shimmer by default instead of plain spinner, supporting Spinner/Skeleton/Linear types per contract (FR-028); create LoadingType enum in src/BlazorBaseTemplate.Web/Features/DataExample/Components/LoadingType.cs
 - [x] T057 [P] [US3] Create DataTable.razor component in src/BlazorBaseTemplate.Web/Features/DataExample/Components/DataTable.razor with MudTable<SampleDataItem> columns
 - [x] T058 [US3] Implement loading state (MudSkeleton) and empty state message in DataTable.razor
 - [x] T059 [US3] Create DataExample.razor page in src/BlazorBaseTemplate.Web/Features/DataExample/DataExample.razor with @page "/data"
@@ -200,14 +200,14 @@
 - [x] T073 [P] Test accessibility with browser dev tools (WCAG 2.1 AA via MudBlazor built-in support)
 - [x] T074 Test on multiple browsers: Chrome, Firefox, Safari, Edge
 - [x] T075 Final code review: verify all files ≤200 lines, record types for entities, file-scoped namespaces, _camelCase fields (Constitution IX + X)
-- [ ] T092 [P] Validate WCAG AA contrast ratios for all PaletteLight and PaletteDark color pairings using browser dev tools or contrast checker (FR-022)
-- [ ] T093 [P] Validate dark mode persistence: toggle dark mode, refresh browser, confirm preference restored from localStorage (FR-020)
-- [ ] T094 [P] Validate glassmorphism: verify MudDrawer shows backdrop-filter blur effect in both light and dark modes (FR-025)
-- [ ] T095 [P] Validate prefers-reduced-motion: enable "Reduce motion" in OS settings, verify all animations and transitions are disabled (FR-029)
-- [ ] T096 [P] Validate Inter font: verify Inter loads from Google Fonts CDN and renders as primary font-family in browser inspector (FR-023)
-- [ ] T097 [P] Validate skeleton loading: navigate to "/data", verify MudSkeleton shimmer effect appears during data load (FR-028)
-- [ ] T098 Update README.md to document dark mode toggle, theming customization (CustomTheme.cs), and visual design system overview
-- [ ] T099 Run quickstart.md validation — verify all expected outputs from quickstart.md match actual app behavior including glassmorphism, dark mode, page transitions
+- [x] T092 [P] Validate WCAG AA contrast ratios for all PaletteLight and PaletteDark color pairings using browser dev tools or contrast checker (FR-022)
+- [x] T093 [P] Validate dark mode persistence: toggle dark mode, refresh browser, confirm preference restored from localStorage (FR-020)
+- [x] T094 [P] Validate glassmorphism: verify MudDrawer shows backdrop-filter blur effect in both light and dark modes (FR-025)
+- [x] T095 [P] Validate prefers-reduced-motion: enable "Reduce motion" in OS settings, verify all animations and transitions are disabled (FR-029)
+- [x] T096 [P] Validate Inter font: verify Inter loads from Google Fonts CDN and renders as primary font-family in browser inspector (FR-023)
+- [x] T097 [P] Validate skeleton loading: navigate to "/data", verify MudSkeleton shimmer effect appears during data load (FR-028)
+- [x] T098 Update README.md to document dark mode toggle, theming customization (CustomTheme.cs), and visual design system overview
+- [x] T099 Run quickstart.md validation — verify all expected outputs from quickstart.md match actual app behavior including glassmorphism, dark mode, page transitions
 
 ---
 

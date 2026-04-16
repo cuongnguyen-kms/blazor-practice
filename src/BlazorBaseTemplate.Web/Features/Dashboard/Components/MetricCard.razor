@@ -1,0 +1,81 @@
+@namespace BlazorBaseTemplate.Web.Features.Dashboard.Components
+
+<MudCard Elevation="@_currentElevation" Class="@Class" @onclick="HandleClick"
+         @onmouseenter="OnMouseEnter" @onmouseleave="OnMouseLeave">
+    <MudCardContent>
+        <div class="d-flex justify-space-between align-center">
+            <div>
+                <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@Metric.Title</MudText>
+                <MudText Typo="Typo.h4" Class="mt-1">@Metric.Value</MudText>
+            </div>
+            @if (Metric.Icon is not null)
+            {
+                <MudIcon Icon="@Metric.Icon" Size="Size.Large" Color="@MapColor(Metric.Color)" />
+            }
+        </div>
+        @if (Metric.TrendDirection is not null)
+        {
+            <div class="d-flex align-center mt-2">
+                <MudIcon Icon="@GetTrendIcon()" Size="Size.Small" Color="@GetTrendColor()" />
+                <MudText Typo="Typo.body2" Color="@GetTrendColor()" Class="ml-1">
+                    @FormatTrend()
+                </MudText>
+            </div>
+        }
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public required DashboardMetric Metric { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public int Elevation { get; set; } = 2;
+    [Parameter] public string Class { get; set; } = "";
+
+    private int _currentElevation;
+
+    protected override void OnParametersSet()
+    {
+        _currentElevation = Elevation;
+    }
+
+    private void OnMouseEnter() => _currentElevation = Elevation + 4;
+    private void OnMouseLeave() => _currentElevation = Elevation;
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+
+    private static Color MapColor(MetricColor color) => color switch
+    {
+        MetricColor.Primary => Color.Primary,
+        MetricColor.Secondary => Color.Secondary,
+        MetricColor.Success => Color.Success,
+        MetricColor.Warning => Color.Warning,
+        MetricColor.Error => Color.Error,
+        MetricColor.Info => Color.Info,
+        _ => Color.Default
+    };
+
+    private string GetTrendIcon() => Metric.TrendDirection switch
+    {
+        TrendDirection.Upward => Icons.Material.Filled.TrendingUp,
+        TrendDirection.Downward => Icons.Material.Filled.TrendingDown,
+        _ => Icons.Material.Filled.TrendingFlat
+    };
+
+    private Color GetTrendColor() => Metric.TrendDirection switch
+    {
+        TrendDirection.Upward => Color.Success,
+        TrendDirection.Downward => Color.Error,
+        _ => Color.Default
+    };
+
+    private string FormatTrend()
+    {
+        if (Metric.TrendPercentage is null) return "";
+        var sign = Metric.TrendPercentage > 0 ? "+" : "";
+        return $"{sign}{Metric.TrendPercentage:F1}%";
+    }
+}

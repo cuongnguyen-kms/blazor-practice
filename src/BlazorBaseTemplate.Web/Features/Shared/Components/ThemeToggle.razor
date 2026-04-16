@@ -1,0 +1,18 @@
+@namespace BlazorBaseTemplate.Web.Features.Shared.Components
+
+<MudIconButton Icon="@(IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+               Color="Color.Inherit"
+               OnClick="Toggle"
+               aria-label="Toggle dark mode" />
+
+@code {
+    [Parameter] public bool IsDarkMode { get; set; }
+    [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
+
+    private async Task Toggle()
+    {
+        var newValue = !IsDarkMode;
+        IsDarkMode = newValue;
+        await IsDarkModeChanged.InvokeAsync(newValue);
+    }
+}
