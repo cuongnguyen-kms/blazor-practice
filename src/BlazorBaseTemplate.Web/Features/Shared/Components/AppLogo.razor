@@ -1,0 +1,21 @@
+@namespace BlazorBaseTemplate.Web.Features.Shared.Components
+
+<div class="d-flex align-center gap-2">
+    <MudIcon Icon="@Icons.Material.Filled.Business" Size="@Size" />
+    @if (ShowText)
+    {
+        <MudText Typo="@GetTypography()">Company Name</MudText>
+    }
+</div>
+
+@code {
+    [Parameter] public Size Size { get; set; } = Size.Medium;
+    [Parameter] public bool ShowText { get; set; } = true;
+
+    private Typo GetTypography() => Size switch
+    {
+        Size.Large => Typo.h5,
+        Size.Small => Typo.body2,
+        _ => Typo.h6
+    };
+}

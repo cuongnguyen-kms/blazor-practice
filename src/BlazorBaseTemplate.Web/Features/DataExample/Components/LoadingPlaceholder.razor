@@ -1,0 +1,26 @@
+@namespace BlazorBaseTemplate.Web.Features.DataExample.Components
+
+@switch (Type)
+{
+    case LoadingType.Spinner:
+        <div class="d-flex flex-column align-center justify-center" style="min-height: @(Height)px">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Class="mt-2">@Message</MudText>
+        </div>
+        break;
+    case LoadingType.Skeleton:
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="@($"{Height}px")" Class="mb-2" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="40px" Class="mb-1" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="40px" Class="mb-1" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="40px" Class="mb-1" />
+        break;
+    case LoadingType.Linear:
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        break;
+}
+
+@code {
+    [Parameter] public string Message { get; set; } = "Loading...";
+    [Parameter] public LoadingType Type { get; set; } = LoadingType.Skeleton;
+    [Parameter] public int Height { get; set; } = 100;
+}

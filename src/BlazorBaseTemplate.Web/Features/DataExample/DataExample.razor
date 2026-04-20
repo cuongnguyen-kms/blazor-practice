@@ -1,0 +1,26 @@
+@namespace BlazorBaseTemplate.Web.Features.DataExample
+@page "/data"
+
+<PageTitle>Data Example</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-2">Data Fetching Example</MudText>
+<MudText Typo="Typo.body1" Class="mud-text-secondary mb-6">
+    This page demonstrates async data loading with service injection, loading states, and error handling.
+</MudText>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Class="mb-4">@_errorMessage</MudAlert>
+}
+else if (_isLoading)
+{
+    <LoadingPlaceholder Message="Fetching data..." Type="LoadingType.Skeleton" Height="300" />
+}
+else if (_items is not null && !_items.Any())
+{
+    <MudAlert Severity="Severity.Info" Class="mb-4">No data records found.</MudAlert>
+}
+else
+{
+    <DataTable Items="@_items" IsLoading="@_isLoading" />
+}

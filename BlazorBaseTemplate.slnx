@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BlazorBaseTemplate.Application/BlazorBaseTemplate.Application.csproj" />
+    <Project Path="src/BlazorBaseTemplate.Domain/BlazorBaseTemplate.Domain.csproj" />
+    <Project Path="src/BlazorBaseTemplate.Infrastructure/BlazorBaseTemplate.Infrastructure.csproj" />
+    <Project Path="src/BlazorBaseTemplate.Web/BlazorBaseTemplate.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BlazorBaseTemplate.Application.Tests/BlazorBaseTemplate.Application.Tests.csproj" />
+    <Project Path="tests/BlazorBaseTemplate.Domain.Tests/BlazorBaseTemplate.Domain.Tests.csproj" />
+    <Project Path="tests/BlazorBaseTemplate.Infrastructure.Tests/BlazorBaseTemplate.Infrastructure.Tests.csproj" />
+    <Project Path="tests/BlazorBaseTemplate.Web.Tests/BlazorBaseTemplate.Web.Tests.csproj" />
+  </Folder>
+</Solution>

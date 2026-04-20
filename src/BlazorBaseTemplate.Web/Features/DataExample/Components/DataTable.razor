@@ -1,0 +1,63 @@
+@namespace BlazorBaseTemplate.Web.Features.DataExample.Components
+@using BlazorBaseTemplate.Domain.Entities
+
+@if (IsLoading)
+{
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="40px" Class="mb-2" />
+    @for (var i = 0; i < 5; i++)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="32px" Class="mb-1" />
+    }
+}
+else if (Items is null || !Items.Any())
+{
+    <MudAlert Severity="Severity.Info">No data available.</MudAlert>
+}
+else
+{
+    <MudTable Items="@Items" Hover="true" Striped="true" Elevation="2"
+              T="SampleDataItem" OnRowClick="HandleRowClick">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Value</MudTh>
+            <MudTh>Created Date</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Color="@GetStatusColor(context.Status)" Size="Size.Small">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Value">@(context.Value?.ToString("C") ?? "—")</MudTd>
+            <MudTd DataLabel="Created Date">@context.CreatedDate.ToString("yyyy-MM-dd")</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    [Parameter] public IEnumerable<SampleDataItem>? Items { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public EventCallback<SampleDataItem> OnRowClick { get; set; }
+    [Parameter] public bool HidePagination { get; set; }
+
+    private async Task HandleRowClick(TableRowClickEventArgs<SampleDataItem> args)
+    {
+        if (OnRowClick.HasDelegate && args.Item is not null)
+            await OnRowClick.InvokeAsync(args.Item);
+    }
+
+    private static Color GetStatusColor(string status) => status switch
+    {
+        "Active" => Color.Success,
+        "Pending" => Color.Warning,
+        "Inactive" => Color.Default,
+        _ => Color.Default
+    };
+}
